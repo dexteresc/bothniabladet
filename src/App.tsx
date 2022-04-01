@@ -1,7 +1,10 @@
-import { Route, Routes } from "react-router";
-import Login from "@/pages/Login";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
+import { ReactNode, useMemo, useState } from "react";
+import Login from "./pages/Login";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import AuthContext, { useAuth, User } from "./contexts/auth";
+import Search from "./pages/Search";
 
 /*
 STYLE REF
@@ -20,6 +23,39 @@ active-link: bg-blue-200
 
 */
 
+function AuthProvider({ children }: { children: ReactNode }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  const login = (newUser: User) => {
+    setIsAuthenticated(true);
+    setUser(newUser);
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    setUser(null);
+  };
+  const value = useMemo(() => ({ isAuthenticated, user, login, logout }), []);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+// eslint-disable-next-line no-unused-vars
+function RequireAuth({ children }: { children: JSX.Element }) {
+  const auth = useAuth();
+  const location = useLocation();
+
+  if (!auth.user) {
+    // Redirect them to the /login page, but save the current location they were
+    // trying to go to when they were redirected. This allows us to send them
+    // along to that page after they login, which is a nicer user experience
+    // than dropping them off on the home page.
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
 function App() {
   if (
     localStorage.theme === "dark" ||
@@ -32,11 +68,15 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Home />}>
+          <Route path="/search" element={<Search />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
