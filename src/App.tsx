@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import AuthContext, { useAuth, User } from "./contexts/auth";
 import Search from "./pages/Search";
+import Default from "./layout/Default";
 
 /*
 STYLE REF
@@ -70,7 +71,8 @@ function App() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/" element={<Home />}>
+        <Route path="/" element={<Default />}>
+          <Route path="" element={<Home />} />
           <Route path="/search" element={<Search />} />
         </Route>
         <Route path="/login" element={<Login />} />
