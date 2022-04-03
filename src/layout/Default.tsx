@@ -1,8 +1,19 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 
 function Default() {
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const onOpen = () => {
+    setIsOpen(true);
+    document.body.classList.add("overflow-hidden");
+  };
+  const onClose = () => {
+    setIsOpen(false);
+    document.body.classList.remove("overflow-hidden");
+  };
   const items = [
     {
       name: "All",
@@ -40,8 +51,8 @@ function Default() {
 
   return (
     <>
-      <Navbar />
-      <Sidebar items={items} />
+      <Navbar navigate={navigate} onOpen={onOpen} isOpen={isOpen} />
+      <Sidebar items={items} isOpen={isOpen} onClose={onClose} />
       <div className="lg:pl-[20rem] pt-16">
         {/*
         <header className="fixed top-16 h-14 w-full bg-green-50">
