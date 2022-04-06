@@ -1,7 +1,8 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
+import { useEffect, useState } from "react";
+import Sidebar, { NavItem } from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import { getCategories } from "@/api/category";
 
 function Default() {
   const navigate = useNavigate();
@@ -14,40 +15,37 @@ function Default() {
     setIsOpen(false);
     document.body.classList.remove("overflow-hidden");
   };
-  const items = [
+
+  const [items, setItems] = useState<NavItem[]>([
     {
       name: "All",
       path: "/"
-    },
-    {
-      name: "Category 1",
-      path: "/category/1",
-      icon: "folder",
-      subItems: [
-        {
-          name: "Subcategory 1",
-          path: "/category/1/subcategory/1",
-          icon: "folder"
-        },
-        {
-          name: "Subcategory 2",
-          path: "/category/1/subcategory/2",
-          icon: "folder"
-        }
-      ]
-    },
-    {
-      name: "Category 2",
-      path: "/category/2",
-      icon: "folder",
-      subItems: [
-        {
-          name: "Subcategory 1",
-          path: "/category/2/subcategory/1"
-        }
-      ]
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    getCategories()
+      .then((result) => {
+        setItems((prev) => [
+          ...prev,
+          ...result.map((category) => ({
+            name: category.name,
+            path: `/category/${category.id}`
+          }))
+        ]);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    return () => {
+      setItems([
+        {
+          name: "All",
+          path: "/"
+        }
+      ]);
+    };
+  }, []);
 
   return (
     <>
