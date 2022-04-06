@@ -1,9 +1,6 @@
 import { createContext, useContext } from "react";
+import { User } from "@/api/user";
 
-export interface User {
-  name: string;
-  email: string;
-}
 interface IAuthContext {
   isAuthenticated: boolean;
   user: any;
