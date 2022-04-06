@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Logo from "@/components/Logo";
 import Loading from "@/assets/loading.svg";
+import Input from "@/components/Input";
 
 interface LoginError {
   username?: string;
@@ -24,7 +25,11 @@ function Login() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.currentTarget.blur();
+    // Blur current input
+
+    e.currentTarget.querySelector<HTMLInputElement>("input:focus")?.blur();
+
+    console.log(e.currentTarget);
 
     const newError: LoginError = {};
 
@@ -75,12 +80,10 @@ function Login() {
           )}
           <label className="mb-5 font-semibold">
             Username:
-            <input
+            <Input
               className={`${
-                error.username
-                  ? "border-red-500 text-red-500 focus:text-gray-700 dark:focus:text-gray-200"
-                  : "border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200"
-              } w-full bg-gray-100 dark:bg-gray-700 border rounded py-2 px-4 focus:outline-none focus:border-gray-500 dark:focus:border-gray-500 autofill:bg-inherit mt-2`}
+                error.username ?? "border-red-500 text-red-500"
+              } w-full mt-2`}
               type="text"
               name="username"
               value={username}
@@ -89,12 +92,10 @@ function Login() {
           </label>
           <label className="font-semibold">
             Password:
-            <input
+            <Input
               className={`${
-                error.password
-                  ? "border-red-500 text-red-500 focus:text-gray-700 dark:focus:text-gray-200"
-                  : "border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200"
-              } w-full bg-gray-100 dark:bg-gray-700 border rounded py-2 px-4 outline-none focus:border-gray-500 dark:focus:border-gray-500 autofill:bg-inherit mt-2`}
+                error.password ?? "border-red-500 text-red-500"
+              } w-full mt-2`}
               type="password"
               name="password"
               value={password}
