@@ -3,9 +3,11 @@ import { ReactNode, useMemo, useState } from "react";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import AuthContext, { useAuth, User } from "./contexts/auth";
+import AuthContext, { useAuth } from "./contexts/auth";
 import Search from "./pages/Search";
 import Default from "./layout/Default";
+import { User } from "./api/user";
+import Upload from "./pages/Upload";
 
 /*
 STYLE REF
@@ -76,6 +78,7 @@ function App() {
           <Route path="/search" element={<Search />} />
         </Route>
         <Route path="/login" element={<Login />} />
+        <Route path="/upload" element={<Upload />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
