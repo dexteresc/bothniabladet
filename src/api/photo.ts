@@ -24,7 +24,7 @@ export function uploadPhoto(photo: PhotoUpload): Promise<Photo> {
   formData.append("title", photo.title);
   formData.append("description", photo.description);
 
-  return post<FormData, Photo>("/photo", formData)
+  return post<FormData, Photo>("/photo", formData);
 }
 
 export function getPhoto(id: number): Promise<Photo> {
@@ -37,4 +37,16 @@ export function getPhotos(): Promise<Photo[]> {
 
 export function deletePhoto(id: number): Promise<void> {
   return del<void>(`/photo/${id}`);
+}
+
+export function searchPhotos(query: string, limit?: number): Promise<Photo[]> {
+  // Validate query
+  if (typeof query !== "string") {
+    throw new Error("Query must be a string");
+  }
+  if (!query) {
+    throw new Error("Query is required");
+  }
+
+  return get<Photo[]>(`/photo/search?query=${query}?limit=${limit}`);
 }
