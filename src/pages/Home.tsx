@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Photo, getPhotos } from "@/api/photo";
 import PhotoGrid from "@/components/PhotoGrid";
-import ThemeButton from "@/components/ThemeButton";
 
 function Home() {
   const [error, setError] = useState<null | Error>(null);
@@ -30,7 +29,6 @@ function Home() {
         {!isLoaded && <div>Loading...</div>}
         {isLoaded && !error && <PhotoGrid photos={photos} />}
       </main>
-      <ThemeButton />
     </main>
   );
 }
