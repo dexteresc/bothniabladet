@@ -7,7 +7,7 @@ function PhotoItem({ photo }: { photo: Photo }) {
     </div>
   );
 }
-function PhotoGrid({ photos }: { photos: Photo[] }) {
+function PhotoGrid({ photos, text }: { photos: Photo[]; text?: string }) {
   return (
     <div className="">
       {photos.length > 0 ? (
@@ -17,7 +17,9 @@ function PhotoGrid({ photos }: { photos: Photo[] }) {
           ))}
         </div>
       ) : (
-        <div className="text-center p-4 border border-gray-500 rounded">No photos found</div>
+        <div className="text-center p-4 border border-gray-500 rounded">
+          {text ?? "No photos found"}
+        </div>
       )}
     </div>
   );
