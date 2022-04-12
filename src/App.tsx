@@ -8,6 +8,7 @@ import Search from "./pages/Search";
 import Default from "./layout/Default";
 import { User } from "./api/user";
 import Upload from "./pages/Upload";
+import Profile from "./pages/Profile";
 
 /*
 STYLE REF
@@ -76,6 +77,7 @@ function App() {
         <Route path="/" element={<Default />}>
           <Route path="" element={<Home />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/upload" element={<Upload />} />
