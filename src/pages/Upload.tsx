@@ -1,110 +1,200 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+/* eslint-disable no-unused-vars */
+import { Component, createRef, ReactNode, useEffect, useState } from "react";
+import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { Category, getCategories } from "@/api/category";
 import Input, { FileInput, TextArea } from "@/components/Input";
-import ThemeButton from "@/components/ThemeButton";
+import { uploadPhoto } from "@/api/photo";
 
-function Upload() {
-  const navigate = useNavigate();
+interface UploadProps {
+  navigate: NavigateFunction;
+}
+interface UploadState {
+  title: string;
+  description: string;
+  fileUrl: string;
+  selectedCategories: Category[];
+  categories: Category[];
+  error: Error | null;
+  isLoaded: boolean;
+}
 
-  const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [categories, setCategories] = useState<Category[]>([]);
-  // eslint-disable-next-line no-unused-vars
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+class Upload extends Component<UploadProps, UploadState> {
+  private fileInputEl = createRef<FileInput>();
 
-  useEffect(() => {
-    getCategories()
-      .then((result) => {
-        setIsLoaded(true);
-        setCategories(result);
-      })
-      .catch((err) => {
-        setIsLoaded(true);
-        setError(err);
-      });
-  }, []);
-
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    // Check that file is an image
-    if (event.target.files && event.target.files[0]) {
-      const newFile = event.target.files[0];
-      if (!newFile.type.startsWith("image/")) {
-        setError(new TypeError("File is not an image."));
-        return;
-      }
-      setFile(newFile);
-    }
-
-    // Clear error
-    setError(null);
+  constructor(props: UploadProps) {
+    super(props);
+    this.state = {
+      title: "",
+      description: "",
+      fileUrl: "",
+      selectedCategories: [],
+      categories: [],
+      error: null,
+      isLoaded: false
+    };
   }
 
-  return (
-    <main className="flex flex-col min-h-screen py-5 max-w-3xl mx-auto px-4">
-      <header className="mb-4">
-        <button
-          type="button"
-          className="material-icons mb-5"
-          onClick={() => navigate(-1)}
-        >
-          arrow_back
-        </button>
-        <h1 className="font-semibold text-2xl">Upload</h1>
-      </header>
-      <main>
-        {error && <div>Error: {error.message}</div>}
-        {!isLoaded && <div>Loading...</div>}
-        {isLoaded && (
-          <form className="flex flex-col">
-            <FileInput type="file" id="file" onChange={handleFileChange}>
-              {!file ? (
-                "Upload image"
-              ) : (
-                <img
-                  className="h-16 w-16 mb-2"
-                  src={URL.createObjectURL(file)}
-                  alt={file.name}
-                />
-              )}
-            </FileInput>
-            <div className="mb-2">
-              <label className="text-sm" htmlFor="title">
-                Title
-              </label>
-              <Input type="text" id="title" className="w-full" />
-            </div>
-            <div className="mb-2">
-              <label className="text-sm" htmlFor="description">
-                Description
-              </label>
-              <TextArea id="description" className="w-full h-28" />
-            </div>
-            <div className="mb-2">
-              <label className="text-sm" htmlFor="categories">
-                Categories
-              </label>
-            </div>
-            <div className="mb-2">
-              <label className="text-sm" htmlFor="tags">
-                Tags
-              </label>
-              <Input type="text" id="tags" className="w-full" />
-            </div>
-            <div className="mb-2">
-              <label className="text-sm" htmlFor="location">
-                Location
-              </label>
-              <Input type="text" id="location" className="w-full" />
-            </div>
-          </form>
-        )}
+  componentDidMount() {
+    getCategories().then((categories) => {
+      this.setState({
+        categories,
+        isLoaded: true
+      });
+    });
+  }
+
+  handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { target } = event;
+    // @ts-ignore
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const { name, id } = target;
+
+    // @ts-ignore
+    this.setState({
+      [name ?? id]: value
+    });
+  };
+
+  handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const { title, description } = this.state;
+    const { navigate } = this.props;
+
+    if (!this.fileInputEl.current) {
+      return;
+    }
+    const file = this.fileInputEl.current.state.files?.[0];
+
+    if (!file) {
+      this.setState({ error: new Error("No file selected.") });
+      return;
+    }
+
+    if (title && description) {
+      const data = {
+        title,
+        description,
+        file
+      };
+
+      uploadPhoto(data).then((response) => {
+        if (response) {
+          navigate(`/photo/${response.id}`);
+        } else {
+          navigate("/");
+        }
+      });
+    } else {
+      this.setState({ error: new Error("Title and description required.") });
+    }
+  };
+
+  handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      this.setState({
+        fileUrl: URL.createObjectURL(file)
+      });
+    }
+  };
+
+  render(): ReactNode {
+    const {
+      title,
+      description,
+      fileUrl,
+      selectedCategories,
+      categories,
+      error,
+      isLoaded
+    } = this.state;
+
+    return (
+      <main className="flex flex-col min-h-screen py-5 max-w-3xl mx-auto px-4">
+        <header className="mb-4">
+          <Link to="/" className="material-icons mb-5">
+            arrow_back
+          </Link>
+          <h1 className="font-semibold text-2xl">Upload</h1>
+        </header>
+        <main>
+          {error && <div>Error: {error.message}</div>}
+          {!isLoaded && <div>Loading...</div>}
+          {isLoaded && (
+            <form className="flex flex-col" onSubmit={this.handleSubmit}>
+              <FileInput
+                type="file"
+                id="file"
+                ref={this.fileInputEl}
+                accept="image/*"
+                onChange={this.handleFileChange}
+              >
+                {!fileUrl ? (
+                  "Upload image"
+                ) : (
+                  <img
+                    className="h-16 w-16 mb-2"
+                    src={fileUrl}
+                    alt="Preview of upload"
+                  />
+                )}
+              </FileInput>
+              <div className="mb-2">
+                <label className="text-sm" htmlFor="title">
+                  Title
+                  <Input
+                    onChange={this.handleInputChange}
+                    value={title}
+                    type="text"
+                    id="title"
+                    name="title"
+                    className="w-full"
+                  />
+                </label>
+              </div>
+              <div className="mb-2">
+                <label className="text-sm" htmlFor="description">
+                  Description
+                  <TextArea
+                    onChange={this.handleInputChange}
+                    value={description}
+                    id="description"
+                    name="description"
+                    className="w-full h-28"
+                  />
+                </label>
+              </div>
+              <div className="mb-2">
+                <label className="text-sm" htmlFor="categories">
+                  Categories
+                </label>
+              </div>
+              <div className="mb-2">
+                <label className="text-sm" htmlFor="tags">
+                  Tags
+                  <Input type="text" id="tags" name="tags" className="w-full" />
+                </label>
+              </div>
+              <div className="mb-2">
+                <label className="text-sm" htmlFor="location">
+                  Location
+                  <Input
+                    type="text"
+                    id="location"
+                    name="location"
+                    className="w-full"
+                  />
+                </label>
+              </div>
+              <Input type="submit" value="Upload" />
+            </form>
+          )}
+        </main>
       </main>
-      <ThemeButton />
-    </main>
-  );
+    );
+  }
 }
 
 export default Upload;
