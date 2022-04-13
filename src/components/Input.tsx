@@ -1,7 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 // Component for all different inputs
 
-import { InputHTMLAttributes, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  Component,
+  createRef,
+  InputHTMLAttributes,
+  ReactNode
+} from "react";
 
 function Input({
   type = "text",
@@ -31,45 +37,64 @@ function Input({
   );
 }
 
-export function FileInput({
-  children,
-  id,
-  accept = "image/*",
-  className,
-  onChange
-}: InputHTMLAttributes<HTMLInputElement>) {
-  const [file, setFile] = useState<File | null>(null);
-  const inputEl = useRef<HTMLInputElement>(null);
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setFile(event.target.files[0]);
+type FileInputProps = InputHTMLAttributes<HTMLInputElement>;
+type FileInputState = { files: FileList | null };
+export class FileInput extends Component<FileInputProps, FileInputState> {
+  inputEl = createRef<HTMLInputElement>();
+
+  constructor(props: FileInputProps) {
+    super(props);
+    this.state = {
+      files: null
+    };
+  }
+
+  handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    const { onChange } = this.props;
+    if (files && files.length > 0) {
+      this.setState({
+        files
+      });
     }
+
     if (onChange) {
-      onChange(event);
+      onChange(e);
     }
   };
 
-  return (
-    <button onClick={() => inputEl.current?.click()} type="button">
-      <div
-        className={
-          className ??
-          "w-full text-blue-600 dark:text-white bg-blue-200 dark:bg-blue-600 ring-1 ring-transparent active:ring-blue-400 p-2 rounded transition-all font-semibold select-none"
-        }
-      >
-        {children ?? (!file ? "Upload file" : <>{file.name} uploaded</>)}
-      </div>
-      <input
-        ref={inputEl}
-        className="hidden"
-        id={id}
-        type="file"
-        onChange={handleChange}
-        accept={accept}
-        aria-hidden
-      />
-    </button>
-  );
+  render(): ReactNode {
+    const { accept, className, children, id } = this.props;
+    const { files } = this.state;
+    return (
+      <button onClick={() => this.inputEl.current?.click()} type="button">
+        <div
+          className={
+            className ??
+            "w-full text-blue-600 dark:text-white bg-blue-200 dark:bg-blue-600 ring-1 ring-transparent active:ring-blue-400 p-2 rounded transition-all font-semibold select-none"
+          }
+        >
+          {children ??
+            (files && files.length > 0 ? (
+              <>
+                {files.length} file{files.length > 1 && "s"} selected
+              </>
+            ) : (
+              "Select file"
+            ))}
+        </div>
+        <input
+          ref={this.inputEl}
+          className="hidden"
+          id={id}
+          type="file"
+          onChange={this.handleChange}
+          accept={accept}
+          aria-hidden
+        />
+      </button>
+    );
+  }
 }
 
 export function TextArea({
