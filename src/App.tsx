@@ -1,4 +1,10 @@
-import { Route, Routes, useLocation, Navigate } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  useLocation,
+  Navigate,
+  useNavigate
+} from "react-router-dom";
 import { ReactNode, useMemo, useState } from "react";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -71,16 +77,18 @@ function App() {
     document.documentElement.classList.remove("dark");
   }
 
+  const navigate = useNavigate();
+
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/" element={<Default />}>
+        <Route path="/" element={<Default navigate={navigate} />}>
           <Route path="" element={<Home />} />
           <Route path="/search" element={<Search />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="/login" element={<Login />} />
-        <Route path="/upload" element={<Upload />} />
+        <Route path="/upload" element={<Upload navigate={navigate} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>

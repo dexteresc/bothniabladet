@@ -1,11 +1,14 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { NavigateFunction, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Sidebar, { NavItem } from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { getCategories } from "@/api/category";
 
-function Default() {
-  const navigate = useNavigate();
+interface DefaultPageProps {
+  navigate: NavigateFunction;
+}
+
+function Default({ navigate }: DefaultPageProps) {
   const [isOpen, setIsOpen] = useState(false);
   const onOpen = () => {
     setIsOpen(true);
