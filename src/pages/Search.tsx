@@ -25,7 +25,10 @@ function Search() {
 
   return (
     <div>
-      <PhotoGrid photos={photos} text={`No photos found for ${query}`} />
+      <h1>
+        Search for <em>&quot;{query}&quot;</em>
+      </h1>
+      <PhotoGrid photos={photos} text={`No photos found for "${query}"`} />
     </div>
   );
 }
