@@ -13,9 +13,10 @@ export interface Photo {
   url: string;
   title: string;
   description: string;
-  dateAdded: Date;
   user?: User;
   categories?: Category[];
+  createdDate: string;
+  updatedDate: string;
 }
 
 export function uploadPhoto(photo: PhotoUpload): Promise<Photo> {
@@ -28,7 +29,8 @@ export function uploadPhoto(photo: PhotoUpload): Promise<Photo> {
 }
 
 export function getPhoto(id: number): Promise<Photo> {
-  return get<Photo>(`/photo/${id}`);
+  const photo = get<Photo>(`/photo/${id}`);
+  return photo;
 }
 
 export function getPhotos(): Promise<Photo[]> {
