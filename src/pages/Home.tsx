@@ -20,16 +20,16 @@ function Home() {
   }, []);
 
   return (
-    <main className="flex flex-col">
+    <div className="flex flex-col">
       <header className="mb-4">
         <h1 className="font-semibold text-2xl">All</h1>
       </header>
-      <main>
+      <section>
         {error && <div>Error: {error.message}</div>}
         {!isLoaded && <div>Loading...</div>}
         {isLoaded && !error && <PhotoGrid photos={photos} />}
-      </main>
-    </main>
+      </section>
+    </div>
   );
 }
 
