@@ -2,14 +2,20 @@ import { FormEvent, Component, createRef } from "react";
 import { Link, NavigateFunction } from "react-router-dom";
 import Logo from "./Logo";
 
-function NavIcon({ icon, className }: { icon: string; className?: string }) {
+export function Icon({
+  value,
+  className
+}: {
+  value: string;
+  className?: string;
+}) {
   return (
     <span
       className={`${className} material-icons text-xl select-none w-7 ${
         className?.includes("flex") ?? "flex"
       } items-center justify-center`}
     >
-      {icon}
+      {value}
     </span>
   );
 }
@@ -39,6 +45,14 @@ class Navbar extends Component<NavbarProps, NavbarState> {
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("resize", this.handleSearchResize);
+
+    // Fetch query from URL
+    // ! Is this OK?
+    const searchParams = new URLSearchParams(window.location.search);
+    const search = searchParams.get("q");
+    if (search) {
+      this.setState({ search });
+    }
   }
 
   componentWillUnmount() {
@@ -85,6 +99,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
   handleSearchClick = () => {
     const { current } = this.searchRef;
     const { searchOpen } = this.state;
+    const { navigate } = this.props;
     if (window.innerWidth < 1024 && current) {
       if (searchOpen) {
         this.setState(
@@ -94,6 +109,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           }),
           () => {
             current.blur();
+            navigate("/");
           }
         );
       } else {
@@ -150,12 +166,12 @@ class Navbar extends Component<NavbarProps, NavbarState> {
                 onClick={this.handleSearchClick}
                 className="cursor-pointer lg:cursor-default p-2"
               >
-                <NavIcon
-                  icon="search"
+                <Icon
+                  value="search"
                   className={searchOpen ? "hidden lg:flex" : "flex"}
                 />
-                <NavIcon
-                  icon="arrow_back"
+                <Icon
+                  value="arrow_back"
                   className={searchOpen ? "flex lg:hidden" : "hidden"}
                 />
               </button>
@@ -180,7 +196,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
                   this.setState({ search: "" });
                 }}
               >
-                <NavIcon icon="close" />
+                <Icon value="close" />
               </button>
             </form>
             <div
@@ -188,19 +204,19 @@ class Navbar extends Component<NavbarProps, NavbarState> {
                 searchOpen ? "hidden md:flex" : "flex"
               }`}
             >
-              <button
-                type="button"
+              <Link
+                to="/upload"
                 className="mr-0 lg:mr-2 font-semibold flex items-center p-2 lg:px-4 lg:py-2 transition-all hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-blue-200 dark:active:bg-gray-500 whitespace-nowrap select-none rounded-full lg:rounded"
               >
-                <NavIcon icon="upload" />
+                <Icon value="upload" />
                 <span className="hidden lg:block">Ladda upp</span>
-              </button>
-              <button
-                type="button"
+              </Link>
+              <Link
+                to="/profile"
                 className="rounded-full h-auto p-2 flex items-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 select-none"
               >
-                <NavIcon icon="account_circle" />
-              </button>
+                <Icon value="account_circle" />
+              </Link>
             </div>
           </div>
         </nav>
