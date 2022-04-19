@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
-interface NavItem {
+export interface NavItem {
   name: string;
   path?: string;
   subItems?: NavItem[];
@@ -111,7 +111,7 @@ function Sidebar({
     <aside
       className={`${
         isOpen ? "block" : "hidden"
-      } lg:block fixed top-16 bottom-0 w-64 lg:w-[20rem] bg-inherit border-r border-r-gray-100 dark:border-r-gray-900`}
+      } lg:block fixed top-16 bottom-0 w-64 lg:w-[20rem] bg-inherit border-r border-r-gray-100 dark:border-r-gray-900 shadow-lg lg:shadow-none z-40`}
       role="navigation"
     >
       <nav className="w-full h-full p-2">
