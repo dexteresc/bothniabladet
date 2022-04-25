@@ -1,24 +1,7 @@
 import { FormEvent, Component, createRef } from "react";
 import { Link, NavigateFunction } from "react-router-dom";
+import Icon from "./Icon";
 import Logo from "./Logo";
-
-export function Icon({
-  value,
-  className
-}: {
-  value: string;
-  className?: string;
-}) {
-  return (
-    <span
-      className={`${className} material-icons text-xl select-none w-7 ${
-        className?.includes("flex") ?? "flex"
-      } items-center justify-center`}
-    >
-      {value}
-    </span>
-  );
-}
 
 interface NavbarProps {
   navigate: NavigateFunction;
@@ -147,7 +130,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
               {isOpen ? "close" : "menu"}
             </button>
             <Link to="/" className="pl-2 py-2 pr-4 mr-4 flex-none">
-              <Logo className="w-12" />
+              <Logo className="w-12 text-black dark:text-white" />
             </Link>
           </div>
 
