@@ -14,6 +14,7 @@ export const post = <T, R = T>(url: string, data: T): Promise<R> =>
     .post(baseURL + url, data)
     .then((response) => response.data)
     .catch((error) => {
+      console.error(error.response);
       throw error;
     });
 
@@ -28,6 +29,7 @@ export const get = <T>(url: string): Promise<T> =>
     .get(baseURL + url)
     .then((response) => response.data)
     .catch((error) => {
+      console.error(error.response);
       throw error;
     });
 
