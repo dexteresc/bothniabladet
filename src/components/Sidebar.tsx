@@ -90,21 +90,21 @@ function Sidebar({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  // if open listen for clicks outside of sidebar
+  // if open listen for click
+  function handleClick() {
+    if (isOpen) {
+      onClose();
+    }
+  }
   useEffect(() => {
     if (isOpen) {
-      const handleClick = (e: MouseEvent) => {
-        if (e.target instanceof Element && !e.target.closest("aside")) {
-          onClose();
-        }
-      };
       document.addEventListener("click", handleClick);
-      return () => {
-        document.removeEventListener("click", handleClick);
-      };
+    } else {
+      document.removeEventListener("click", handleClick);
     }
-
-    return () => {};
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
   }, [isOpen, onClose]);
 
   return (
@@ -114,8 +114,8 @@ function Sidebar({
       } lg:block fixed top-16 bottom-0 w-64 lg:w-[20rem] bg-inherit border-r border-r-gray-100 dark:border-r-gray-900 shadow-lg lg:shadow-none z-40`}
       role="navigation"
     >
-      <nav className="w-full h-full p-2">
-        <ul className="">
+      <nav className="w-full h-full overflow-auto p-2">
+        <ul>
           {items.map((item) => (
             <ListItem item={item} key={item.name} />
           ))}
