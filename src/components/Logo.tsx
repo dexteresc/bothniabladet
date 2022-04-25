@@ -3,7 +3,7 @@ function Logo({ className }: { className?: string }) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 353.75 202.23"
-      className={`${className} text-black dark:text-white`}
+      className={className}
       version="1"
     >
       <title>BothniaBladet logo</title>
