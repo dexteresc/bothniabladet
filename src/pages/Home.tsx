@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Photo, getPhotos } from "@/api/photo";
 import PhotoGrid from "@/components/PhotoGrid";
+import Loading from "@/components/Loading";
 
 function Home() {
   const [error, setError] = useState<null | Error>(null);
@@ -26,7 +27,7 @@ function Home() {
       </header>
       <section>
         {error && <div>Error: {error.message}</div>}
-        {!isLoaded && <div>Loading...</div>}
+        {!isLoaded && <Loading />}
         {isLoaded && !error && <PhotoGrid photos={photos} />}
       </section>
     </div>

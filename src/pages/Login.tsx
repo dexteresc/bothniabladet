@@ -2,8 +2,8 @@ import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Logo from "@/components/Logo";
-import Loading from "@/assets/loading.svg";
 import Input from "@/components/Input";
+import Loading from "@/components/Loading";
 
 interface LoginError {
   username?: string;
@@ -28,8 +28,6 @@ function Login() {
     // Blur current input
 
     e.currentTarget.querySelector<HTMLInputElement>("input:focus")?.blur();
-
-    console.log(e.currentTarget);
 
     const newError: LoginError = {};
 
@@ -108,9 +106,7 @@ function Login() {
             className="mt-5 px-4 py-2 rounded bg-blue-600 dark:bg-blue-600 text-gray-100 font-semibold cursor-pointer"
           />
         </form>
-        <img
-          src={Loading}
-          alt="loading"
+        <Loading
           className={`${
             isLoading ? "opacity-100" : "opacity-0"
           } transition-opacity w-20 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2`}

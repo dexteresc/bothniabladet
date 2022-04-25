@@ -4,6 +4,7 @@ import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { Category, getCategories } from "@/api/category";
 import Input, { FileInput, TextArea } from "@/components/Input";
 import { uploadPhoto } from "@/api/photo";
+import Loading from "@/components/Loading";
 
 interface UploadProps {
   navigate: NavigateFunction;
@@ -40,6 +41,10 @@ class Upload extends Component<UploadProps, UploadState> {
         categories,
         isLoaded: true
       });
+      // ! Test
+      this.setState({
+        isLoaded: false
+      });
     });
   }
 
@@ -72,6 +77,12 @@ class Upload extends Component<UploadProps, UploadState> {
       return;
     }
 
+    // If file isn't an image, throw error
+    if (!file.type.startsWith("image/")) {
+      this.setState({ error: new Error("File must be an image.") });
+      return;
+    }
+
     if (title && description) {
       const data = {
         title,
@@ -94,6 +105,11 @@ class Upload extends Component<UploadProps, UploadState> {
   handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // If file isn't an image, throw error
+      if (!file.type.startsWith("image/")) {
+        this.setState({ error: new Error("File must be an image.") });
+        return;
+      }
       this.setState({
         fileUrl: URL.createObjectURL(file)
       });
@@ -119,9 +135,9 @@ class Upload extends Component<UploadProps, UploadState> {
           </Link>
           <h1 className="font-semibold text-2xl">Upload</h1>
         </header>
-        <main>
+        <main className="flex-1">
           {error && <div>Error: {error.message}</div>}
-          {!isLoaded && <div>Loading...</div>}
+          {!isLoaded && <Loading className="flex-1" />}
           {isLoaded && (
             <form className="flex flex-col" onSubmit={this.handleSubmit}>
               <FileInput
