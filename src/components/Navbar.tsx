@@ -160,7 +160,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
               </button>
               <input
                 ref={this.searchRef}
-                type="text"
+                type="search"
                 placeholder="Search"
                 value={search}
                 onChange={this.handleSearchChange}
