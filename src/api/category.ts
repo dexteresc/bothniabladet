@@ -3,6 +3,14 @@ import { del, get, post, put } from "./axios";
 export interface Category {
   id: number;
   name: string;
+  parentId: number;
+  type: "folder" | "category";
+}
+
+export interface CategoryUpload {
+  name: string;
+  type: "folder" | "category";
+  parentId?: number;
 }
 
 /**
@@ -32,8 +40,10 @@ export const getCategory = async (id: number): Promise<Category> =>
  * @returns {Promise<Category>} category
  * @throws {Error}
  */
-export const createCategory = async (category: Category): Promise<Category> =>
-  post<Category>("/category", category).catch((err) => {
+export const createCategory = async (
+  category: CategoryUpload
+): Promise<Category> =>
+  post<CategoryUpload, Category>("/category", category).catch((err) => {
     throw err;
   });
 
