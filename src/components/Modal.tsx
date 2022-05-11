@@ -12,8 +12,11 @@ interface ModalProps {
 
 function Modal({ children, isOpen, onClose, title, className }: ModalProps) {
   useEffect(() => {
-    document.body.classList.toggle("overflow-hidden", isOpen);
-  });
+    document.body.classList.toggle("overflow-hidden");
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isOpen]);
   return isOpen ? (
     <div className="fixed inset-0 z-40 flex items-center justify-center">
       <div
@@ -23,11 +26,11 @@ function Modal({ children, isOpen, onClose, title, className }: ModalProps) {
         role="none"
       />
       <div className="relative bg-white dark:bg-gray-700 rounded-lg px-2 pb-2 pt-4 z-50">
-        <header className="mb-4">
-          {title && <h1 className="text-2xl">{title}</h1>}
+        <header className="mb-4 flex">
+          {title && <h1 className="text-2xl mr-10">{title}</h1>}
           <button
             type="button"
-            className="absolute top-0 right-0 p-4"
+            className="p-4"
             onClick={onClose}
           >
             <span className="material-icons">close</span>
