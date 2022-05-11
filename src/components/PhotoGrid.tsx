@@ -6,7 +6,7 @@ function PhotoItem({ photo }: { photo: Photo }) {
   const location = useLocation();
 
   return (
-    <div className="rounded-lg bg-gray-200 dark:bg-gray-700 relative z-0 m-2">
+    <div className="rounded-lg bg-gray-200 dark:bg-gray-700 relative z-0 m-2 h-min">
       <Link to={`/photo/${photo.id}`} state={{ backgroundLocation: location }}>
         <img
           src={`http://localhost:8080${photo.url}`}
