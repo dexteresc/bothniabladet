@@ -19,12 +19,11 @@ function Default({ navigate }: DefaultPageProps) {
     document.body.classList.remove("overflow-hidden");
   };
 
-  const [items, setItems] = useState<NavItem[]>([
-    {
-      name: "All",
-      path: "/"
-    }
-  ]);
+  const [items, setItems] = useState<NavItem[]>([]);
+
+  const updateItems = (newItems: NavItem[]): void => {
+    setItems(newItems);
+  };
 
   useEffect(() => {
     getCategories()
@@ -32,7 +31,9 @@ function Default({ navigate }: DefaultPageProps) {
         setItems((prev) => [
           ...prev,
           ...result.map((category) => ({
+            id: category.id,
             name: category.name,
+            type: category.type,
             path: `/category/${category.id}`
           }))
         ]);
@@ -43,8 +44,10 @@ function Default({ navigate }: DefaultPageProps) {
     return () => {
       setItems([
         {
+          id: 1,
           name: "All",
-          path: "/"
+          path: "/",
+          type: "category"
         }
       ]);
     };
@@ -53,7 +56,7 @@ function Default({ navigate }: DefaultPageProps) {
   return (
     <>
       <Navbar navigate={navigate} onOpen={onOpen} isOpen={isOpen} />
-      <Sidebar items={items} isOpen={isOpen} onClose={onClose} />
+      <Sidebar items={items} isOpen={isOpen} onClose={onClose} updateItems={updateItems} />
       <div className="lg:pl-[20rem] pt-16">
         {/*
         <header className="fixed top-16 h-14 w-full bg-green-50">
