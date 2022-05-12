@@ -3,7 +3,7 @@ import { del, get, post, put } from "./axios";
 export interface Category {
   id: number;
   name: string;
-  parentId: number;
+  parentId: number | null;
   type: "folder" | "category";
 }
 
