@@ -1,14 +1,11 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { createCategory } from "@/api/category";
+import { Category, createCategory } from "@/api/category";
 import Input from "./Input";
-import Alert from "./Alert";
+import { useAlert } from "@/contexts/alert";
 
-export interface NavItem {
-  id: number;
-  name: string;
-  type: "folder" | "category";
-  path?: string;
+export interface NavItem extends Category {
+  path: string;
   subItems?: NavItem[];
 }
 
@@ -38,11 +35,11 @@ function ListItem({
   }, []);
 
   return (
-    <li className={`mb-2 last:mb-0 h-fit ${className}`}>
-      {item.subItems && item.subItems.length > 0 ? (
+    <li className={`mb-2 last:mb-0 h-fit ${className ?? ""}`}>
+      {item.type === "folder" ? (
         <button
           type="button"
-          className="flex items-center pl-2 pr-4 py-2 rounded group hover:transition-all hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 whitespace-nowrap w-full focus:ring-1 focus:ring-inset"
+          className="flex items-center pl-2 pr-4 py-2 rounded group hover:transition-all hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 whitespace-nowrap w-full focus:ring-1 focus:ring-inset outline-none"
           onClick={toggle}
         >
           <span
@@ -58,7 +55,7 @@ function ListItem({
           <NavLink
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center py-2 pr-4 pl-9 rounded hover:transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-blue-100 dark:active:bg-gray-500 whitespace-nowrap w-full 
+              `outline-none flex items-center py-2 pr-4 pl-9 rounded hover:transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-blue-100 dark:active:bg-gray-500 whitespace-nowrap w-full 
               ${
                 isActive
                   ? "text-blue-500 dark:text-blue-300 font-semibold bg-gray-100 dark:bg-gray-700"
@@ -71,7 +68,7 @@ function ListItem({
         )
       )}
       {item.subItems && item.subItems.length > 0 && isOpen && (
-        <ul className="pl-9 my-2 text-gray-600 dark:text-gray-300 ">
+        <ul className="pl-8 my-2 text-gray-600 dark:text-gray-300 ">
           {item.subItems.map((subItem) => (
             <ListItem
               key={subItem.id}
@@ -89,14 +86,11 @@ function ListItem({
 function Sidebar({
   items,
   isOpen,
-  onClose,
-  updateItems
+  onClose
 }: {
   items: NavItem[];
   isOpen: boolean;
   onClose: () => void;
-  // eslint-disable-next-line no-unused-vars
-  updateItems: (newItems: NavItem[]) => void;
 }) {
   const [activeId, setActiveId] = useState<number | null>(null); // Active item id
 
@@ -105,10 +99,7 @@ function Sidebar({
   const [isAddOpen, setIsAddOpen] = useState(false); // Add category open state
   const [addType, setAddType] = useState<"folder" | "category">("folder"); // Add category type
 
-  const [alert, setAlert] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null); // Alert message
+  const { addAlert } = useAlert();
   // Closes sidebar if clicked outside or clicked on link
   useEffect(() => {
     if (isOpen) {
@@ -153,7 +144,7 @@ function Sidebar({
       return;
     }
     if (input.length > 20) {
-      setAlert({ type: "error", message: "Category name too long" });
+      addAlert("error", "Category name too long");
     }
     if (addType === "folder") {
       createCategory({
@@ -161,15 +152,13 @@ function Sidebar({
         type: "folder",
         parentId: activeId ?? undefined
       })
-        .then((newItem) => {
-          setAlert({ type: "success", message: "Folder created" });
+        .then(() => {
+          addAlert("success", "Folder created");
           setIsAddOpen(false);
           setAddInputVal("");
-          const newItems = [...items, newItem];
-          updateItems(newItems);
         })
         .catch((err) => {
-          setAlert({ type: "error", message: err.message });
+          addAlert("error", err.message);
         });
     } else {
       createCategory({
@@ -177,104 +166,92 @@ function Sidebar({
         type: "category",
         parentId: activeId ?? undefined
       })
-        .then((newItem) => {
-          const newItems = [...items, newItem];
-          updateItems(newItems);
-          setAlert({ type: "success", message: "Category created" });
+        .then(() => {
+          addAlert("success", "Category created");
           setIsAddOpen(false);
           setAddInputVal("");
         })
         .catch((err) => {
-          setAlert({ type: "error", message: err.message });
+          addAlert("error", err.message);
         });
     }
   };
 
-  // Test
-  useEffect(() => {
-    console.log("Active id: ", activeId);
-  }, [activeId]);
+  // TODO: Add active category for easier add.
+  // TODO: Add way to remove or alternatively edit categories.
+
   return (
-    <>
-      <aside
-        className={`${
-          isOpen ? "flex" : "hidden"
-        } lg:flex flex-col fixed top-16 bottom-0 w-64 lg:w-[20rem] bg-inherit border-r border-r-gray-100 dark:border-r-gray-900 shadow-lg lg:shadow-none z-40 p-2`}
-        role="navigation"
+    <aside
+      className={`${
+        isOpen ? "flex" : "hidden"
+      } lg:flex flex-col fixed top-16 bottom-0 w-64 lg:w-[20rem] bg-inherit border-r border-r-gray-100 dark:border-r-gray-900 shadow-lg lg:shadow-none z-40 p-2`}
+      role="navigation"
+    >
+      <nav
+        className="flex-1 w-full overflow-y-auto"
+        onClick={(e) => {
+          // Check if click is exact element and not child
+          if (e.target instanceof Element && !e.target.closest("li")) {
+            setActiveId(null);
+          }
+        }}
       >
-        <nav
-          className="flex-1 w-full overflow-y-auto"
-          onClick={(e) => {
-            // Check if click is exact element and not child
-            if (e.target instanceof Element && !e.target.closest("li")) {
-              setActiveId(null);
-            }
-          }}
-        >
-          <ul className="">
-            {items.map((item) => (
-              <ListItem
-                item={item}
-                key={item.id}
-                onClick={() => setActiveId(item.id)}
-              />
-            ))}
-          </ul>
-        </nav>
-        <div className="w-full">
-          <form
-            onSubmit={handleAddSubmit}
-            className={`flex overflow-hidden flex-nowrap 
+        <ul className="">
+          {items.map((item) => (
+            <ListItem
+              item={item}
+              key={item.id}
+              onClick={() => setActiveId(item.id)}
+            />
+          ))}
+        </ul>
+      </nav>
+      <div className="w-full">
+        <form
+          onSubmit={handleAddSubmit}
+          className={`flex overflow-hidden flex-nowrap 
             ${isAddOpen ? "visible" : "hidden"}
         `}
+        >
+          <Input
+            placeholder={`Create ${addType}`}
+            className="rounded-r-none flex-1 min-w-0"
+            ref={addInputEl}
+            value={addInputVal}
+            onChange={(e) => setAddInputVal(e.target.value)}
+          />
+          <Input
+            type="submit"
+            className="rounded-l-none flex-none"
+            value="Add"
+          />
+        </form>
+        <div className={`flex group ${isAddOpen ? "hidden" : "visible"}`}>
+          <button
+            type="button"
+            className="transition-all flex basis-1/2 justify-center rounded px-4 py-2 group-hover:basis-0 group-hover:hover:basis-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 hover:dark:bg-gray-600 active:bg-gray-300 dark:active:bg-gray-500 text-gray-700 dark:text-gray-300 mr-1"
+            title="Add new directory"
+            onClick={() => {
+              setAddType("folder");
+              setIsAddOpen(true);
+            }}
           >
-            <Input
-              placeholder={`Create ${addType}`}
-              className="rounded-r-none flex-1 min-w-0"
-              ref={addInputEl}
-              value={addInputVal}
-              onChange={(e) => setAddInputVal(e.target.value)}
-            />
-            <Input
-              type="submit"
-              className="rounded-l-none flex-none"
-              value="Add"
-            />
-          </form>
-          <div className={`flex group ${isAddOpen ? "hidden" : "visible"}`}>
-            <button
-              type="button"
-              className="transition-all flex basis-1/2 justify-center rounded px-4 py-2 group-hover:basis-0 group-hover:hover:basis-full hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 text-gray-700 dark:text-gray-300"
-              title="Add new directory"
-              onClick={() => {
-                setAddType("folder");
-                setIsAddOpen(true);
-              }}
-            >
-              <span className="material-icons">folder</span>
-            </button>
-            <button
-              type="button"
-              className="transition-all flex basis-1/2 justify-center rounded px-4 py-2 group-hover:basis-0 group-hover:hover:basis-full hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 text-gray-700 dark:text-gray-300"
-              title="Add new category"
-              onClick={() => {
-                setAddType("category");
-                setIsAddOpen(true);
-              }}
-            >
-              <span className="material-icons">add</span>
-            </button>
-          </div>
+            <span className="material-icons">folder</span>
+          </button>
+          <button
+            type="button"
+            className="transition-all flex basis-1/2 justify-center rounded px-4 py-2 group-hover:basis-0 group-hover:hover:basis-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 hover:dark:bg-gray-600 active:bg-gray-300 dark:active:bg-gray-500 text-gray-700 dark:text-gray-300 ml-1"
+            title="Add new category"
+            onClick={() => {
+              setAddType("category");
+              setIsAddOpen(true);
+            }}
+          >
+            <span className="material-icons">add</span>
+          </button>
         </div>
-      </aside>
-      {alert && (
-        <Alert
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
-    </>
+      </div>
+    </aside>
   );
 }
 

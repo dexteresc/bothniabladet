@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Sidebar, { NavItem } from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { Category, getCategories } from "@/api/category";
+import { useAlert } from "@/contexts/alert";
 
 interface DefaultPageProps {
   navigate: NavigateFunction;
@@ -19,6 +20,8 @@ function Default({ navigate }: DefaultPageProps) {
     document.body.classList.remove("overflow-hidden");
   };
 
+  const { addAlert } = useAlert();
+
   const [items, setItems] = useState<NavItem[]>([
     {
       id: 0,
@@ -29,6 +32,7 @@ function Default({ navigate }: DefaultPageProps) {
     }
   ]);
 
+  // Todo: Move to api maybe ?
   const spreadTree = (categories: Category[]) => {
     const tree = (c: NavItem[], rootId: number) => {
       let r: NavItem = {
@@ -48,11 +52,11 @@ function Default({ navigate }: DefaultPageProps) {
         o[b.id] = b;
         if (b.id === rootId) {
           r = b;
-          r.path = `/category/${b.name}`;
+          r.path = `/category/${b.id}`;
         } else if (b.parentId) {
           o[b.parentId] = o[b.parentId] || {};
           o[b.parentId].subItems = o[b.parentId].subItems || [];
-          b.path = `${o[b.parentId].path}/${b.name}`;
+          b.path = `${o[b.parentId].path}/${b.id}`;
           // @ts-ignore
           o[b.parentId].subItems.push(b);
         }
@@ -75,7 +79,7 @@ function Default({ navigate }: DefaultPageProps) {
         setItems((prevItems) => [...prevItems, ...spreadTree(categories)]);
       })
       .catch((err) => {
-        console.error(err);
+        addAlert(err.message, "error");
       });
     return () => {
       setItems([
