@@ -17,6 +17,8 @@ import { User } from "./api/user";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
 import { PhotoModal, PhotoViewFull } from "./pages/PhotoView";
+import { AlertProvider } from "./components/Alert";
+import Category from "./pages/Category";
 
 /*
 STYLE REF
@@ -86,23 +88,26 @@ function App() {
 
   return (
     <AuthProvider>
-      <Routes location={state?.backgroundLocation || location}>
-        <Route path="/" element={<Default navigate={navigate} />}>
-          <Route path="" element={<Home />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
-        <Route path="/photo/:photoId" element={<PhotoViewFull />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/upload" element={<Upload navigate={navigate} />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-
-      {state?.backgroundLocation && (
-        <Routes>
-          <Route path="/photo/:photoId" element={<PhotoModal />} />
+      <AlertProvider>
+        <Routes location={state?.backgroundLocation || location}>
+          <Route path="/" element={<Default navigate={navigate} />}>
+            <Route path="" element={<Home />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/category/*" element={<Category />} />
+          </Route>
+          <Route path="/photo/:photoId" element={<PhotoViewFull />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/upload" element={<Upload navigate={navigate} />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      )}
+
+        {state?.backgroundLocation && (
+          <Routes>
+            <Route path="/photo/:photoId" element={<PhotoModal />} />
+          </Routes>
+        )}
+      </AlertProvider>
     </AuthProvider>
   );
 }
