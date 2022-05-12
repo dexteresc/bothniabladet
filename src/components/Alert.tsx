@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Alert({
   type,
@@ -13,10 +13,13 @@ export default function Alert({
 }) {
   const [isOpen, setIsOpen] = useState(true);
 
-  setTimeout(() => {
-    setIsOpen(false);
-    onClose?.();
-  }, timeout);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsOpen(false);
+      onClose?.();
+    }, timeout);
+    return () => clearTimeout(timer);
+  });
   if (type === "error") {
     return isOpen ? (
       <div
