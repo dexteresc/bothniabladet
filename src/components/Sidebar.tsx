@@ -1,8 +1,8 @@
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Category, createCategory } from "@/api/category";
-import Input from "./Input";
 import { useAlert } from "@/contexts/alert";
+import Input from "./Input";
 
 export interface NavItem extends Category {
   path: string;
@@ -11,19 +11,27 @@ export interface NavItem extends Category {
 
 function ListItem({
   item,
-  onClick,
-  className
+  className = "",
+  activeId,
+  setActiveId,
+  onContextMenu
 }: {
   item: NavItem;
-  onClick?: () => void;
   className?: string;
+  activeId: number | null;
+  // eslint-disable-next-line no-unused-vars
+  setActiveId: (id: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  onContextMenu: (e: React.MouseEvent<HTMLLIElement>, id: number) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+
   const toggle = () => {
     // Save the current state of the dropdown
     localStorage.setItem(item.id.toString(), JSON.stringify(!isOpen));
     setIsOpen(!isOpen);
   };
+
   useEffect(() => {
     if (item.subItems) {
       // fetch open state from local storage
@@ -35,12 +43,20 @@ function ListItem({
   }, []);
 
   return (
-    <li className={`mb-2 last:mb-0 h-fit ${className ?? ""}`}>
+    <li
+      className={`mb-2 last:mb-0 h-fit ${className}`}
+      onContextMenu={(e) => onContextMenu(e, item.id)}
+    >
       {item.type === "folder" ? (
         <button
           type="button"
-          className="flex items-center pl-2 pr-4 py-2 rounded group hover:transition-all hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 whitespace-nowrap w-full focus:ring-1 focus:ring-inset outline-none"
-          onClick={toggle}
+          className={`flex items-center pl-2 pr-4 py-2 rounded group transition-all hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 whitespace-nowrap w-full outline-none ${
+            activeId === item.id ? "ring-1 ring-inset" : ""
+          }`}
+          onClick={() => {
+            toggle();
+            setActiveId(item.id);
+          }}
         >
           <span
             className={`material-icons mr-1 select-none  group-hover:transition-transform
@@ -73,8 +89,9 @@ function ListItem({
             <ListItem
               key={subItem.id}
               item={subItem}
-              onClick={onClick}
-              className=""
+              setActiveId={setActiveId}
+              activeId={activeId}
+              onContextMenu={(e) => onContextMenu(e, item.id)}
             />
           ))}
         </ul>
@@ -86,20 +103,29 @@ function ListItem({
 function Sidebar({
   items,
   isOpen,
-  onClose
+  onClose,
+  updateItems
 }: {
   items: NavItem[];
   isOpen: boolean;
   onClose: () => void;
+  updateItems: () => void;
 }) {
+  const { addAlert } = useAlert();
+
   const [activeId, setActiveId] = useState<number | null>(null); // Active item id
 
   const addInputEl = useRef<HTMLInputElement>(null); // Add input element
   const [addInputVal, setAddInputVal] = useState(""); // Add category input value
   const [isAddOpen, setIsAddOpen] = useState(false); // Add category open state
   const [addType, setAddType] = useState<"folder" | "category">("folder"); // Add category type
+  const [anchorPoint, setAnchorPoint] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    id: number;
+  }>({ visible: false, x: 0, y: 0, id: 0 });
 
-  const { addAlert } = useAlert();
   // Closes sidebar if clicked outside or clicked on link
   useEffect(() => {
     if (isOpen) {
@@ -145,40 +171,43 @@ function Sidebar({
     }
     if (input.length > 20) {
       addAlert("error", "Category name too long");
+      return;
     }
-    if (addType === "folder") {
-      createCategory({
-        name: addInputVal,
-        type: "folder",
-        parentId: activeId ?? undefined
+
+    createCategory({
+      name: addInputVal,
+      type: addType,
+      parentId: activeId ?? undefined
+    })
+      .then(() => {
+        addAlert("success", `${addType}`);
+        setIsAddOpen(false);
+        setAddInputVal("");
+        updateItems();
       })
-        .then(() => {
-          addAlert("success", "Folder created");
-          setIsAddOpen(false);
-          setAddInputVal("");
-        })
-        .catch((err) => {
-          addAlert("error", err.message);
-        });
-    } else {
-      createCategory({
-        name: addInputVal,
-        type: "category",
-        parentId: activeId ?? undefined
-      })
-        .then(() => {
-          addAlert("success", "Category created");
-          setIsAddOpen(false);
-          setAddInputVal("");
-        })
-        .catch((err) => {
-          addAlert("error", err.message);
-        });
-    }
+      .catch((err) => {
+        addAlert("error", err.message);
+      });
   };
 
-  // TODO: Add active category for easier add.
-  // TODO: Add way to remove or alternatively edit categories.
+  const handleContextMenu = (e: React.MouseEvent, id: number) => {
+    e.preventDefault();
+    setAnchorPoint({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      id
+    });
+    document.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      setAnchorPoint({
+        visible: false,
+        x: 0,
+        y: 0,
+        id: 0
+      });
+    });
+  };
 
   return (
     <aside
@@ -201,7 +230,9 @@ function Sidebar({
             <ListItem
               item={item}
               key={item.id}
-              onClick={() => setActiveId(item.id)}
+              setActiveId={setActiveId}
+              activeId={activeId}
+              onContextMenu={handleContextMenu}
             />
           ))}
         </ul>
@@ -251,6 +282,24 @@ function Sidebar({
           </button>
         </div>
       </div>
+      {/* Context menu */}
+      {anchorPoint.visible && (
+        <div
+          className="fixed z-40"
+          style={{
+            top: anchorPoint.y,
+            left: anchorPoint.x
+          }}
+        >
+          <div className="bg-gray-50 dark:bg-gray-900 rounded shadow-md">
+            <span className="pl-8">{anchorPoint.id}</span>
+            <div className="flex items-center px-4 py-2">
+              <span className="material-icons mr-2">delete</span>
+              <span>Delete category</span>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
