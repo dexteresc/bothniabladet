@@ -14,11 +14,11 @@ export default function CategoryView() {
   const [category, setCategory] = useState<Category | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<null | Error>(null);
 
   useEffect(() => {
     const parameterStr = params["*"];
     if (!parameterStr) {
-      console.error("No category name provided");
       navigate("/");
       return;
     }
@@ -37,25 +37,14 @@ export default function CategoryView() {
       navigate("/");
       return;
     }
-    // Fetch category
-    getCategory(categoryId)
-      .then((cat) => {
-        if (!cat) {
-          console.log("Category not found");
-          navigate("/");
-          return;
-        }
+    // Create promise
+    Promise.all([getCategory(categoryId), getPhotosByCategory(categoryId)])
+      .then(([cat, pho]) => {
         setCategory(cat);
+        setPhotos(pho);
       })
       .catch((err) => {
-        addAlert("error", err.message);
-      });
-    // Fetch photos
-    getPhotosByCategory(categoryId)
-      .then((pht) => {
-        setPhotos(pht);
-      })
-      .catch((err) => {
+        setError(err);
         addAlert("error", err.message);
       })
       .finally(() => {
@@ -67,13 +56,13 @@ export default function CategoryView() {
     <div className="flex flex-col">
       {isLoaded ? (
         <>
-          <header className="mb-4">
-            <h1 className="font-semibold text-2xl">
-              {category?.name ?? "IDK"}
-            </h1>
-          </header>
+          {category && (
+            <header className="mb-4 flex justify-between">
+              <h1 className="font-semibold text-2xl">{category.name}</h1>
+            </header>
+          )}
           <section>
-            <PhotoGrid photos={photos} />
+            <PhotoGrid photos={photos} text={error?.message} />
           </section>
         </>
       ) : (
