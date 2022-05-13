@@ -22,14 +22,18 @@ function Home() {
 
   return (
     <div className="flex flex-col">
-      <header className="mb-4">
-        <h1 className="font-semibold text-2xl">All</h1>
-      </header>
-      <section>
-        {error && <div>Error: {error.message}</div>}
-        {!isLoaded && <Loading />}
-        {isLoaded && !error && <PhotoGrid photos={photos} />}
-      </section>
+      {isLoaded ? (
+        <>
+          <header className="mb-4">
+            <h1 className="font-semibold text-2xl">All</h1>
+          </header>
+          <section>
+            <PhotoGrid photos={photos} text={error?.message} />
+          </section>
+        </>
+      ) : (
+        <Loading />
+      )}
     </div>
   );
 }
