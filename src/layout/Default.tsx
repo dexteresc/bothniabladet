@@ -22,15 +22,7 @@ function Default({ navigate }: DefaultPageProps) {
 
   const { addAlert } = useAlert();
 
-  const [items, setItems] = useState<NavItem[]>([
-    {
-      id: 0,
-      name: "All",
-      path: "/",
-      type: "category",
-      parentId: null
-    }
-  ]);
+  const [items, setItems] = useState<NavItem[]>([]);
 
   // Todo: Move to api maybe ?
   const spreadTree = (categories: Category[]) => {
@@ -73,14 +65,36 @@ function Default({ navigate }: DefaultPageProps) {
     return result;
   };
 
-  useEffect(() => {
+  function retrieveCategories() {
     getCategories()
       .then((categories) => {
-        setItems((prevItems) => [...prevItems, ...spreadTree(categories)]);
+        setItems(() => [
+          {
+            id: 0,
+            name: "All",
+            path: "/",
+            type: "category",
+            parentId: null
+          },
+          ...spreadTree(categories)
+        ]);
       })
       .catch((err) => {
-        addAlert(err.message, "error");
+        setItems([
+          {
+            id: 0,
+            name: "All",
+            path: "/",
+            type: "category",
+            parentId: null
+          }
+        ]);
+        addAlert("error", err.message);
       });
+  }
+
+  useEffect(() => {
+    retrieveCategories();
     return () => {
       setItems([
         {
@@ -97,7 +111,12 @@ function Default({ navigate }: DefaultPageProps) {
   return (
     <>
       <Navbar navigate={navigate} onOpen={onOpen} isOpen={isOpen} />
-      <Sidebar items={items} isOpen={isOpen} onClose={onClose} />
+      <Sidebar
+        items={items}
+        isOpen={isOpen}
+        onClose={onClose}
+        updateItems={retrieveCategories}
+      />
       <div className="lg:pl-[20rem] pt-16">
         {/*
         <header className="fixed top-16 h-14 w-full bg-green-50">
