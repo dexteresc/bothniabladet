@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { ReactNode, useMemo, useState } from "react";
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp"
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import AuthContext, { useAuth } from "./contexts/auth";
@@ -98,6 +99,7 @@ function App() {
           </Route>
           <Route path="/photo/:photoId" element={<PhotoViewFull />} />
           <Route path="/login" element={<Login />} />
+          <Route path ="/signup" element={<SignUp />} />
           <Route path="/upload" element={<Upload navigate={navigate} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
