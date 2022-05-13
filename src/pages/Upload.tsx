@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-import { Component, createRef, ReactNode, useEffect, useState } from "react";
-import { Link, NavigateFunction, useNavigate } from "react-router-dom";
+import { Component, createRef, ReactNode } from "react";
+import { Link, NavigateFunction } from "react-router-dom";
 import { Category, getCategories } from "@/api/category";
-import Input, { FileInput, TextArea } from "@/components/Input";
+import Input, { FileInput, SelectList, TextArea } from "@/components/Input";
 import { uploadPhoto } from "@/api/photo";
 import Loading from "@/components/Loading";
 
@@ -40,10 +39,6 @@ class Upload extends Component<UploadProps, UploadState> {
       this.setState({
         categories,
         isLoaded: true
-      });
-      // ! Test
-      this.setState({
-        isLoaded: false
       });
     });
   }
@@ -186,23 +181,17 @@ class Upload extends Component<UploadProps, UploadState> {
                 <label className="text-sm" htmlFor="categories">
                   Categories
                 </label>
-              </div>
-              <div className="mb-2">
-                <label className="text-sm" htmlFor="tags">
-                  Tags
-                  <Input type="text" id="tags" name="tags" className="w-full" />
-                </label>
-              </div>
-              <div className="mb-2">
-                <label className="text-sm" htmlFor="location">
-                  Location
-                  <Input
-                    type="text"
-                    id="location"
-                    name="location"
-                    className="w-full"
-                  />
-                </label>
+                <SelectList
+                  id="categories"
+                  className="w-full max-h-72 overflow-y-scroll"
+                  options={categories}
+                  selected={selectedCategories}
+                  searchable
+                  // @ts-ignore
+                  setSelected={(selected: Category[]) =>
+                    this.setState({ selectedCategories: selected })
+                  }
+                />
               </div>
               <Input type="submit" value="Upload" />
             </form>

@@ -19,6 +19,8 @@ module.exports = {
     shallow: true
   },
   rules: {
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
     "react/require-default-props": "off",
     "react/jsx-filename-extension": [
       2,
@@ -41,9 +43,10 @@ module.exports = {
     "jsx-a11y/no-noninteractive-element-interactions": "off",
     "jsx-a11y/label-has-associated-control": "off",
     "react/jsx-no-bind": [
-      2, {
+      2,
+      {
         allowArrowFunctions: true,
-        allowFunctions: true,
+        allowFunctions: true
       }
     ]
   }

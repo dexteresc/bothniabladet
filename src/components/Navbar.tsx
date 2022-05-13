@@ -126,10 +126,11 @@ class Navbar extends Component<NavbarProps, NavbarState> {
               type="button"
               className="material-icons block lg:hidden p-2 select-none"
               onClick={isOpen ? () => {} : onOpen}
+              aria-expanded={isOpen}
             >
               {isOpen ? "close" : "menu"}
             </button>
-            <Link to="/" className="pl-2 py-2 pr-4 mr-4 flex-none">
+            <Link to="/" className="pl-2 py-2 pr-4 mr-4 flex-none" role="link">
               <Logo className="w-12 text-black dark:text-white" />
             </Link>
           </div>
