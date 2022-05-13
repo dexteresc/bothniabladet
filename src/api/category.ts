@@ -1,4 +1,5 @@
 import { del, get, post, put } from "./axios";
+import { Photo } from "./photo";
 
 export interface Category {
   id: number;
@@ -30,9 +31,7 @@ export const getCategories = async (): Promise<Category[]> =>
  * @throws {Error}
  */
 export const getCategory = async (id: number): Promise<Category> =>
-  get<Category>(`/category/${id}`).catch((err) => {
-    throw err;
-  });
+  get<Category>(`/category/${id}`);
 
 /**
  * Create new category
@@ -68,3 +67,6 @@ export const deleteCategory = async (id: number): Promise<Category> =>
   del<Category>(`/category/${id}`).catch((err) => {
     throw err;
   });
+
+export const getPhotosByCategory = async (id: number): Promise<Photo[]> =>
+  get<Photo[]>(`/category/${id}/photos`);
