@@ -2,24 +2,23 @@ import {
   Route,
   Routes,
   useLocation,
-  Navigate,
   useNavigate,
   Location
 } from "react-router-dom";
-import { ReactNode, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Login from "./pages/Login";
-import SignUp from "./pages/SignUp"
+import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import AuthContext, { useAuth } from "./contexts/auth";
+import { useAuth } from "./contexts/auth";
 import Search from "./pages/Search";
 import Default from "./layout/Default";
-import { User } from "./api/user";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
 import { PhotoModal, PhotoViewFull } from "./pages/PhotoView";
 import { AlertProvider } from "./components/Alert";
 import CategoryView from "./pages/CategoryView";
+import Loading from "./components/Loading";
 
 /*
 STYLE REF
@@ -38,37 +37,28 @@ active-link: bg-blue-200
 
 */
 
-function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  const login = (newUser: User) => {
-    setIsAuthenticated(true);
-    setUser(newUser);
-  };
-
-  const logout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-  };
-  const value = useMemo(() => ({ isAuthenticated, user, login, logout }), []);
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-// eslint-disable-next-line no-unused-vars
 function RequireAuth({ children }: { children: JSX.Element }) {
-  const auth = useAuth();
+  const { authenticate, token } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+  const reToken = localStorage.getItem("token");
+  const [loading, setLoading] = useState(true);
 
-  if (!auth.user) {
-    // Redirect them to the /login page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience
-    // than dropping them off on the home page.
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  // eslint-disable-next-line consistent-return
+  useEffect(() => {
+    if (!reToken) {
+      return navigate("/login", { replace: true, state: { from: location } });
+    }
+    authenticate(reToken);
+  }, [reToken]);
 
-  return children;
+  useEffect(() => {
+    if (token) {
+      setLoading(false);
+    }
+  }, [token]);
+
+  return loading ? <Loading /> : children;
 }
 
 function App() {
@@ -88,29 +78,48 @@ function App() {
   const state = location.state as { backgroundLocation?: Location };
 
   return (
-    <AuthProvider>
-      <AlertProvider>
-        <Routes location={state?.backgroundLocation || location}>
-          <Route path="/" element={<Default navigate={navigate} />}>
-            <Route path="" element={<Home />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/category/*" element={<CategoryView />} />
-          </Route>
-          <Route path="/photo/:photoId" element={<PhotoViewFull />} />
-          <Route path="/login" element={<Login />} />
-          <Route path ="/signup" element={<SignUp />} />
-          <Route path="/upload" element={<Upload navigate={navigate} />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+    <AlertProvider>
+      <Routes location={state?.backgroundLocation || location}>
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              <Default navigate={navigate} />
+            </RequireAuth>
+          }
+        >
+          <Route path="" element={<Home />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/category/*" element={<CategoryView />} />
+        </Route>
+        <Route
+          path="/photo/:photoId"
+          element={
+            <RequireAuth>
+              <PhotoViewFull />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/upload"
+          element={
+            <RequireAuth>
+              <Upload navigate={navigate} />
+            </RequireAuth>
+          }
+        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
 
-        {state?.backgroundLocation && (
-          <Routes>
-            <Route path="/photo/:photoId" element={<PhotoModal />} />
-          </Routes>
-        )}
-      </AlertProvider>
-    </AuthProvider>
+      {state?.backgroundLocation && (
+        <Routes>
+          <Route path="/photo/:photoId" element={<PhotoModal />} />
+        </Routes>
+      )}
+    </AlertProvider>
   );
 }
 
