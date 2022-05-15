@@ -1,22 +1,22 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 import Input from "@/components/Input";
 import Loading from "@/components/Loading";
+import { login, signup } from "@/api/auth";
 
-interface LoginError {
-  username?: string;
+interface SignUpError {
+  email?: string;
   password?: string;
   other?: string;
 }
 
-function Login() {
-  const [username, setUsername] = useState("");
+function SignUp() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<LoginError>({
-    username: "",
+  const [error, setError] = useState<SignUpError>({
+    email: "",
     password: "",
     other: ""
   });
@@ -29,33 +29,37 @@ function Login() {
 
     e.currentTarget.querySelector<HTMLInputElement>("input:focus")?.blur();
 
-    const newError: LoginError = {};
+    const newError: SignUpError = {
+      email: "",
+      password: "",
+      other: ""
+    };
 
     // Handle errors
-    if (!username) {
-      newError.username = "Username is required";
+    if (!email) {
+      newError.email = "Email is required";
     }
     if (!password) {
       newError.password = "Password is required";
     }
-    if (username && password) {
+    if (email && password) {
       setIsLoading(true);
-      await axios
-        .post("/api/login", { username, password })
-        .then((res) => {
-          if (res.data.success) {
+      await signup(email, password)
+        .then(() => {
+          login(email, password).then(() => {
+            setError(newError);
             navigate("/");
-          } else {
-            newError.other = res.data.message;
-          }
-          setIsLoading(false);
+          });
         })
         .catch((err) => {
-          newError.other = err.message;
+          newError.other =
+            err.response.data ?? err.message ?? "An error occurred";
+          setError(newError);
           setIsLoading(false);
         });
+    } else {
+      setError(newError);
     }
-    setError(newError);
   };
 
   return (
@@ -68,7 +72,7 @@ function Login() {
           onSubmit={handleSubmit}
           className={`${
             isLoading ? "opacity-0" : "opacity-100"
-          } flex flex-col w-full lg:w-1/2 mx-auto transition-opacity`}
+          } flex flex-col w-full lg:w-1/2 mx-auto transition-opacity z-10`}
         >
           <h1 className="text-4xl lg:text-5xl font-semibold my-8">Sign Up</h1>
           {Object.values(error).some((value) => value) && (
@@ -77,22 +81,22 @@ function Login() {
             </p>
           )}
           <label className="mb-5 font-semibold">
-            Username:
+            Email:
             <Input
               className={`${
-                error.username ?? "border-red-500 text-red-500"
+                error.email && "border-red-500 text-red-500"
               } w-full mt-2`}
               type="text"
-              name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </label>
           <label className="font-semibold">
             Password:
             <Input
               className={`${
-                error.password ?? "border-red-500 text-red-500"
+                error.password && "border-red-500 text-red-500"
               } w-full mt-2`}
               type="password"
               name="password"
@@ -100,20 +104,28 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </label>
-          <input
-            type="submit"
-            value="Sign Up"
-            className="mt-5 px-4 py-2 rounded bg-blue-600 dark:bg-blue-600 text-gray-100 font-semibold cursor-pointer"
-          />
+          <Input type="submit" value="Sign Up" className="mt-5 font-semibold" />
         </form>
+        {/* User already have an account */}
+        <p
+          className={`text-center text-gray-600 mt-2 transition-opacity ${
+            isLoading ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-500 dark:text-blue-300">
+            Login
+          </Link>
+        </p>
+
         <Loading
           className={`${
-            isLoading ? "opacity-100" : "opacity-0"
-          } transition-opacity w-20 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2`}
+            isLoading ? "visible" : "hidden"
+          } transition-opacity w-20 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-0`}
         />
       </main>
     </div>
   );
 }
 
-export default Login;
+export default SignUp;
