@@ -1,11 +1,9 @@
 import { useState } from "react";
 import Modal from "@/components/Modal";
 import ThemeButton from "@/components/ThemeButton";
-import { useAlert } from "@/contexts/alert";
 import { useAuth } from "@/contexts/auth";
 
 function Profile() {
-  const { addAlert } = useAlert();
   const { user, logout } = useAuth();
   const [logoutModal, setLogoutModal] = useState(false);
   return (
@@ -57,7 +55,6 @@ function Profile() {
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex-1 mr-1"
                   onClick={() => {
                     logout();
-                    addAlert("success", "Logged out successfully");
                   }}
                 >
                   Yes
