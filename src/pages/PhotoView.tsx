@@ -3,22 +3,28 @@ import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
 import { deletePhoto, getPhoto, Photo } from "@/api/photo";
 import Modal from "@/components/Modal";
+import { useAlert } from "@/contexts/alert";
 
 function PhotoView({ photo }: { photo: Photo }) {
   const navigate = useNavigate();
+  const { addAlert } = useAlert();
   const handleDelete = () => {
     deletePhoto(photo.id)
       .then(() => {
-        navigate(-1);
+        addAlert("success", "Photo deleted");
       })
       .catch((err) => {
-        console.error(err);
+        addAlert("error", err.message);
+      })
+      .finally(() => {
+        navigate(-1);
       });
   };
 
   return (
     <div className="flex flex-col">
       <section className="mb-2">
+        {photo.description}
         <img
           src={`http://localhost:8080${photo.url}`}
           alt={photo.title}
@@ -48,15 +54,14 @@ function PhotoView({ photo }: { photo: Photo }) {
 export function PhotoViewFull() {
   const { photoId } = useParams();
   const [photo, setPhoto] = useState<Photo | null>(null);
-
+  const { addAlert } = useAlert();
   useEffect(() => {
-    console.log(photoId);
     getPhoto(Number(photoId))
       .then((result) => {
         setPhoto(result);
       })
       .catch((err) => {
-        console.error(err);
+        addAlert("error", err.message);
       });
   }, [photoId]);
 
@@ -67,6 +72,7 @@ export function PhotoModal() {
   const { photoId } = useParams();
   const [photo, setPhoto] = useState<Photo | null>(null);
   const navigate = useNavigate();
+  const { addAlert } = useAlert();
 
   useEffect(() => {
     getPhoto(Number(photoId))
@@ -74,7 +80,8 @@ export function PhotoModal() {
         setPhoto(result);
       })
       .catch((err) => {
-        console.error(err);
+        addAlert("error", err.message);
+        navigate(-1);
       });
   }, [photoId]);
 
