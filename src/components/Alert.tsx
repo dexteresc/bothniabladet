@@ -36,9 +36,7 @@ export default function Alert({
   if (type === "success") {
     return isOpen ? (
       <div
-        className={`z-40 mt-2 bg-green-300 text-green-900 rounded p-2 ${
-          className
-        }`}
+        className={`z-40 mt-2 bg-green-300 text-green-900 rounded p-2 ${className}`}
         role="alert"
       >
         {message}
@@ -47,9 +45,7 @@ export default function Alert({
   }
   return isOpen ? (
     <div
-      className={`z-40 mt-2 bg-blue-300 text-blue-900 rounded p-2 ${
-        className
-      }`}
+      className={`z-40 mt-2 bg-blue-300 text-blue-900 rounded p-2 ${className}`}
       role="alert"
     >
       {message}
@@ -80,7 +76,6 @@ export function AlertProvider({ children }: { children: React.ReactNode }) {
     message: string,
     className: string = ""
   ) => {
-    console.log("addAlert", type, message, className);
     setAlerts([...alerts, { type, message, className }]);
     setIsOpen(true);
   };

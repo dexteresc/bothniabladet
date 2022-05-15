@@ -201,7 +201,7 @@ export function SelectList({
     <>
       {/* Searchbar */}
       {searchable && (
-        <div className="flex flex-col my-1">
+        <div className="flex flex-col my-2 border-b pb-2">
           <Input
             type="text"
             value={search}

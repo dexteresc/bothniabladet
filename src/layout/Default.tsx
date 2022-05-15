@@ -118,12 +118,7 @@ function Default({ navigate }: DefaultPageProps) {
         updateItems={retrieveCategories}
       />
       <div className="lg:pl-[20rem] pt-16">
-        {/*
-        <header className="fixed top-16 h-14 w-full bg-green-50">
-          FILTERS
-        </header>
-          */}
-        <main className="px-6 pt-6 min-h-[calc(100vh-64px)]">
+        <main className="p-6 min-h-[calc(100vh-64px)]">
           <Outlet />
         </main>
       </div>

@@ -1,22 +1,25 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 import Input from "@/components/Input";
 import Loading from "@/components/Loading";
+import { login } from "@/api/auth";
+import { useAuth } from "@/contexts/auth";
 
 interface LoginError {
-  username?: string;
+  email?: string;
   password?: string;
   other?: string;
 }
 
 function Login() {
-  const [username, setUsername] = useState("");
+  const auth = useAuth();
+
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<LoginError>({
-    username: "",
+    email: "",
     password: "",
     other: ""
   });
@@ -32,32 +35,37 @@ function Login() {
     const newError: LoginError = {};
 
     // Handle errors
-    if (!username) {
-      newError.username = "Username is required";
+    if (!email) {
+      newError.email = "Email is required";
     }
     if (!password) {
       newError.password = "Password is required";
     }
-    if (username && password) {
+    if (email && password) {
       setIsLoading(true);
-      await axios
-        .post("/api/login", { username, password })
-        .then((res) => {
-          if (res.data.success) {
-            navigate("/");
-          } else {
-            newError.other = res.data.message;
+      await login(email, password)
+        .then(({ token, user }) => {
+          if (!token || !user) {
+            setError({
+              other: "An error occurred"
+            });
+            return;
           }
+          auth.login(user, token);
           setIsLoading(false);
+          navigate("/"); // Redirect to home
         })
         .catch((err) => {
-          newError.other = err.message;
+          // If err.response.data is empty, then err.message is the error message
+          newError.other =
+            err.response.data ?? err.message ?? "An error occurred";
+          setError(newError);
           setIsLoading(false);
         });
+    } else {
+      setError(newError);
     }
-    setError(newError);
   };
-
   return (
     <div className="container mx-auto py-10 px-4 min-h-screen relative">
       <header>
@@ -77,22 +85,22 @@ function Login() {
             </p>
           )}
           <label className="mb-5 font-semibold">
-            Username:
+            Email:
             <Input
               className={`${
-                error.username ?? "border-red-500 text-red-500"
+                error.email && "border-red-500 text-red-500"
               } w-full mt-2`}
               type="text"
-              name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </label>
           <label className="font-semibold">
             Password:
             <Input
               className={`${
-                error.password ?? "border-red-500 text-red-500"
+                error.password && "border-red-500 text-red-500"
               } w-full mt-2`}
               type="password"
               name="password"
@@ -106,10 +114,21 @@ function Login() {
             className="mt-5 px-4 py-2 rounded bg-blue-600 dark:bg-blue-600 text-gray-100 font-semibold cursor-pointer"
           />
         </form>
+        {/* Don't have an account? <Link to="/register">Register</Link> */}
+        <p
+          className={`text-center text-gray-600 mt-2 ${
+            isLoading ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          Don&apos;t have an account?{" "}
+          <Link to="/signup" className="text-blue-500 dark:text-blue-300">
+            Sign up
+          </Link>
+        </p>
         <Loading
           className={`${
-            isLoading ? "opacity-100" : "opacity-0"
-          } transition-opacity w-20 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2`}
+            isLoading ? "visible" : "hidden"
+          } transition-opacity w-20 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-0`}
         />
       </main>
     </div>

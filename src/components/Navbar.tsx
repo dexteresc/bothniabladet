@@ -130,7 +130,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
             >
               {isOpen ? "close" : "menu"}
             </button>
-            <Link to="/" className="pl-2 py-2 pr-4 mr-4 flex-none" role="link">
+            <Link to="/" className="pl-2 py-2 pr-4 mr-4 flex-none outline-none" role="link">
               <Logo className="w-12 text-black dark:text-white" />
             </Link>
           </div>
