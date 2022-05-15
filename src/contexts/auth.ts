@@ -3,18 +3,14 @@ import { User } from "@/api/user";
 
 interface IAuthContext {
   isAuthenticated: boolean;
-  user: any;
-  // eslint-disable-next-line no-unused-vars
-  login(user: User): void;
+  user: User | null;
+  token: string;
+  login(user: User, token: string): void;
   logout(): void;
+  authenticate(token: string): Promise<void>;
 }
 
-const AuthContext = createContext<IAuthContext>({
-  isAuthenticated: false,
-  user: null,
-  login: () => {},
-  logout: () => {}
-});
+const AuthContext = createContext<IAuthContext>(null!);
 
 export function useAuth() {
   return useContext(AuthContext);
