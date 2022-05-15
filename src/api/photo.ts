@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from "axios";
 import { del, get, post } from "./axios";
 import { Category } from "./category";
 import { User } from "./user";
@@ -19,29 +20,36 @@ export interface Photo {
   updatedDate: string;
 }
 
-export function uploadPhoto(photo: PhotoUpload): Promise<Photo> {
+export const uploadPhoto = (
+  photo: PhotoUpload,
+  config?: AxiosRequestConfig
+): Promise<Photo> => {
   const formData = new FormData();
   formData.append("file", photo.file);
   formData.append("title", photo.title);
   formData.append("description", photo.description);
 
-  return post<FormData, Photo>("/photo", formData);
-}
+  return post<FormData, Photo>("/photo", formData, config);
+};
 
-export function getPhoto(id: number): Promise<Photo> {
-  const photo = get<Photo>(`/photo/${id}`);
-  return photo;
-}
+export const getPhoto = (
+  id: number,
+  config?: AxiosRequestConfig
+): Promise<Photo> => get<Photo>(`/photo/${id}`, config);
 
-export function getPhotos(): Promise<Photo[]> {
-  return get<Photo[]>("/photo");
-}
+export const getPhotos = (config?: AxiosRequestConfig): Promise<Photo[]> =>
+  get<Photo[]>("/photo", config);
 
-export function deletePhoto(id: number): Promise<void> {
-  return del<void>(`/photo/${id}`);
-}
+export const deletePhoto = (
+  id: number,
+  config?: AxiosRequestConfig
+): Promise<void> => del<void>(`/photo/${id}`, config);
 
-export function searchPhotos(query: string, limit?: number): Promise<Photo[]> {
+export const searchPhotos = (
+  query: string,
+  config?: AxiosRequestConfig,
+  limit?: number
+): Promise<Photo[]> => {
   // Validate query
   if (typeof query !== "string") {
     throw new Error("Query must be a string");
@@ -50,5 +58,5 @@ export function searchPhotos(query: string, limit?: number): Promise<Photo[]> {
     throw new Error("Query is required");
   }
 
-  return get<Photo[]>(`/photo/search?query=${query}?limit=${limit}`);
-}
+  return get<Photo[]>(`/photo/search?query=${query}?limit=${limit}`, config);
+};

@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from "axios";
 import { del, get, post, put } from "./axios";
 import { Photo } from "./photo";
 
@@ -19,8 +20,10 @@ export interface CategoryUpload {
  * @returns {Promise<Category[]>}
  * @throws {Error}
  */
-export const getCategories = async (): Promise<Category[]> =>
-  get<Category[]>("/category").catch((err) => {
+export const getCategories = async (
+  config?: AxiosRequestConfig
+): Promise<Category[]> =>
+  get<Category[]>("/category", config).catch((err) => {
     throw err;
   });
 
@@ -30,8 +33,10 @@ export const getCategories = async (): Promise<Category[]> =>
  * @returns {Promise<Category>} category
  * @throws {Error}
  */
-export const getCategory = async (id: number): Promise<Category> =>
-  get<Category>(`/category/${id}`);
+export const getCategory = async (
+  id: number,
+  config?: AxiosRequestConfig
+): Promise<Category> => get<Category>(`/category/${id}`, config);
 
 /**
  * Create new category
@@ -40,11 +45,10 @@ export const getCategory = async (id: number): Promise<Category> =>
  * @throws {Error}
  */
 export const createCategory = async (
-  category: CategoryUpload
+  category: CategoryUpload,
+  config?: AxiosRequestConfig
 ): Promise<Category> =>
-  post<CategoryUpload, Category>("/category", category).catch((err) => {
-    throw err;
-  });
+  post<CategoryUpload, Category>("/category", category, config);
 
 /**
  * Update category
@@ -52,10 +56,11 @@ export const createCategory = async (
  * @returns {Promise<Category>} category
  * @throws {Error}
  */
-export const updateCategory = async (category: Category): Promise<Category> =>
-  put<Category>(`/category/${category.id}`, category).catch((err) => {
-    throw err;
-  });
+export const updateCategory = async (
+  category: Category,
+  config?: AxiosRequestConfig
+): Promise<Category> =>
+  put<Category>(`/category/${category.id}`, category, config);
 
 /**
  * Delete category
@@ -63,10 +68,12 @@ export const updateCategory = async (category: Category): Promise<Category> =>
  * @returns {Promise<Category>} category
  * @throws {Error}
  */
-export const deleteCategory = async (id: number): Promise<Category> =>
-  del<Category>(`/category/${id}`).catch((err) => {
-    throw err;
-  });
+export const deleteCategory = async (
+  id: number,
+  config?: AxiosRequestConfig
+): Promise<Category> => del<Category>(`/category/${id}`, config);
 
-export const getPhotosByCategory = async (id: number): Promise<Photo[]> =>
-  get<Photo[]>(`/category/${id}/photos`);
+export const getPhotosByCategory = async (
+  id: number,
+  config?: AxiosRequestConfig
+): Promise<Photo[]> => get<Photo[]>(`/category/${id}/photos`, config);

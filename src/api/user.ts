@@ -1,37 +1,39 @@
-import { del, get, post, put } from "./axios";
+import { AxiosRequestConfig } from "axios";
+import { del, get, put } from "./axios";
 import { Photo } from "./photo";
 
-export interface UserUpload {
-  firstName: string;
-  lastName: string;
+export interface UserRequest {
+  id: number;
   email: string;
+  firstName?: string;
+  lastName?: string;
   photos?: Photo[];
 }
-
-export interface User extends UserUpload {
-  id: number;
+export interface User extends UserRequest {
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export const getUser = async (id: number): Promise<User> =>
-  get<User>(`/user/${id}`).catch((error) => {
+export const getUser = async (
+  id: number,
+  config: AxiosRequestConfig
+): Promise<User> =>
+  get<User>(`/user/${id}`, config).catch((error) => {
     throw error;
   });
 
-// !!! IMPORTANT Should this function catch the error or the throw?
-// TODO Fix user id num not getting reset to lowest value after deleting user
-
-// Create new User
-export const createUser = async (user: UserUpload): Promise<User> =>
-  post<UserUpload, User>("/user", user).catch((error) => {
+export const deleteUser = async (
+  id: number,
+  config: AxiosRequestConfig
+): Promise<User> =>
+  del<User>(`/user/${id}`, config).catch((error) => {
     throw error;
   });
 
-export const deleteUser = async (id: number): Promise<User> =>
-  del<User>(`/user/${id}`).catch((error) => {
-    throw error;
-  });
-
-export const updateUser = async (id: number, user: UserUpload): Promise<User> =>
-  put<UserUpload, User>(`/user/${id}`, user).catch((error) => {
+export const updateUser = async (
+  user: UserRequest,
+  config?: AxiosRequestConfig
+): Promise<User> =>
+  put<UserRequest, User>(`/user/${user.id}`, user, config).catch((error) => {
     throw error;
   });
