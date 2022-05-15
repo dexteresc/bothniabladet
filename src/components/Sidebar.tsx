@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Category, createCategory } from "@/api/category";
 import { useAlert } from "@/contexts/alert";
@@ -13,18 +13,15 @@ function ListItem({
   item,
   className = "",
   activeId,
-  setActiveId,
-  onContextMenu
+  setActiveId
 }: {
   item: NavItem;
   className?: string;
   activeId: number | null;
-  // eslint-disable-next-line no-unused-vars
   setActiveId: (id: number) => void;
-  // eslint-disable-next-line no-unused-vars
-  onContextMenu: (e: React.MouseEvent<HTMLLIElement>, id: number) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setMenuOpen] = useState(false);
 
   const toggle = () => {
     // Save the current state of the dropdown
@@ -42,45 +39,85 @@ function ListItem({
     }
   }, []);
 
+  const handleClickOutside = () => {
+    if (isMenuOpen) {
+      setMenuOpen(false);
+    }
+  };
+
+  // On menu open, add a click handler to close the menu
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.addEventListener("click", handleClickOutside);
+    } else {
+      document.removeEventListener("click", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
   return (
-    <li
-      className={`mb-2 last:mb-0 h-fit ${className}`}
-      onContextMenu={(e) => onContextMenu(e, item.id)}
-    >
+    <li className={`relative mb-2 last:mb-0 h-fit ${className}`}>
       {item.type === "folder" ? (
-        <button
-          type="button"
-          className={`flex items-center pl-2 pr-4 py-2 rounded group transition-all hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 whitespace-nowrap w-full outline-none ${
+        <div
+          className={`relative group rounded ${
             activeId === item.id ? "ring-1 ring-inset" : ""
           }`}
-          onClick={() => {
-            toggle();
-            setActiveId(item.id);
-          }}
         >
-          <span
-            className={`material-icons mr-1 select-none  group-hover:transition-transform
-            ${isOpen ? "rotate-0" : "-rotate-90"}`}
+          <button
+            type="button"
+            className="flex-1 flex items-center pl-2 pr-4 py-2 rounded transition-all whitespace-nowrap w-full outline-none group-hover:bg-gray-100 dark:group-hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+            onClick={() => {
+              toggle();
+              setActiveId(item.id);
+            }}
           >
-            expand_more
-          </span>
-          {item.name}
-        </button>
+            <span
+              className={`material-icons mr-1 select-none 
+            ${isOpen ? "rotate-0" : "-rotate-90"}`}
+            >
+              expand_more
+            </span>
+            {item.name}
+          </button>
+          {/* Options */}
+          <button
+            type="button"
+            className={`group-hover:visible absolute top-1 right-1 h-8 py-1 rounded active:bg-gray-300 dark:active:bg-gray-600 select-none ${
+              isMenuOpen ? "visible" : "invisible"
+            }`}
+            onClick={() => setMenuOpen(!isMenuOpen)}
+          >
+            <span className="material-icons select-none">more_vert</span>
+          </button>
+        </div>
       ) : (
         item.path && (
-          <NavLink
-            to={item.path}
-            className={({ isActive }) =>
-              `outline-none flex items-center py-2 pr-4 pl-9 rounded hover:transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-blue-100 dark:active:bg-gray-500 whitespace-nowrap w-full 
+          <div className="relative group">
+            <NavLink
+              to={item.path}
+              className={({ isActive }) =>
+                `outline-none flex justify-between items-center py-2 pr-4 pl-9 rounded whitespace-nowrap w-full group-hover:transition-colors group-hover:bg-gray-100 dark:group-hover:bg-gray-700 active:bg-blue-100 dark:active:bg-gray-500
               ${
                 isActive
                   ? "text-blue-500 dark:text-blue-300 font-semibold bg-gray-100 dark:bg-gray-700"
                   : ""
               }`
-            }
-          >
-            {item.name}
-          </NavLink>
+              }
+            >
+              {item.name}
+            </NavLink>
+            <button
+              type="button"
+              className={`group-hover:visible absolute top-1 right-1 h-8 py-1 rounded active:bg-gray-300 dark:active:bg-gray-600 select-none ${
+                isMenuOpen ? "visible" : "invisible"
+              }`}
+              onClick={() => setMenuOpen(!isMenuOpen)}
+            >
+              <span className="material-icons select-none">more_vert</span>
+            </button>
+          </div>
         )
       )}
       {item.subItems && item.subItems.length > 0 && isOpen && (
@@ -91,11 +128,46 @@ function ListItem({
               item={subItem}
               setActiveId={setActiveId}
               activeId={activeId}
-              onContextMenu={(e) => onContextMenu(e, item.id)}
             />
           ))}
         </ul>
       )}
+      {
+        // Options
+        isMenuOpen && (
+          <div className="absolute right-0 top-10 w-4/5 mr-1 lg:w-56 bg-gray-50 dark:bg-gray-800 ring-1 ring-gray-300 dark:ring-gray-700 rounded shadow-lg z-40">
+            <div className="flex flex-col">
+              <ul>
+                <li className="">
+                  <NavLink
+                    to={`/categories/${item.id}/edit`}
+                    className="w-full flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+                  >
+                    <span className="material-icons mr-1 select-none">
+                      edit
+                    </span>
+                    Edit
+                  </NavLink>
+                </li>
+                <li className="mb-2">
+                  <button
+                    type="button"
+                    className="w-full flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+                    onClick={() => {
+                      // TODO: Delete category
+                    }}
+                  >
+                    <span className="material-icons mr-1 select-none">
+                      delete
+                    </span>
+                    Delete
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )
+      }
     </li>
   );
 }
@@ -119,12 +191,6 @@ function Sidebar({
   const [addInputVal, setAddInputVal] = useState(""); // Add category input value
   const [isAddOpen, setIsAddOpen] = useState(false); // Add category open state
   const [addType, setAddType] = useState<"folder" | "category">("folder"); // Add category type
-  const [anchorPoint, setAnchorPoint] = useState<{
-    visible: boolean;
-    x: number;
-    y: number;
-    id: number;
-  }>({ visible: false, x: 0, y: 0, id: 0 });
 
   // Closes sidebar if clicked outside or clicked on link
   useEffect(() => {
@@ -190,25 +256,6 @@ function Sidebar({
       });
   };
 
-  const handleContextMenu = (e: React.MouseEvent, id: number) => {
-    e.preventDefault();
-    setAnchorPoint({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY,
-      id
-    });
-    document.addEventListener("click", (ev) => {
-      ev.preventDefault();
-      setAnchorPoint({
-        visible: false,
-        x: 0,
-        y: 0,
-        id: 0
-      });
-    });
-  };
-
   return (
     <aside
       className={`${
@@ -232,7 +279,6 @@ function Sidebar({
               key={item.id}
               setActiveId={setActiveId}
               activeId={activeId}
-              onContextMenu={handleContextMenu}
             />
           ))}
         </ul>
@@ -282,24 +328,6 @@ function Sidebar({
           </button>
         </div>
       </div>
-      {/* Context menu */}
-      {anchorPoint.visible && (
-        <div
-          className="fixed z-40"
-          style={{
-            top: anchorPoint.y,
-            left: anchorPoint.x
-          }}
-        >
-          <div className="bg-gray-50 dark:bg-gray-900 rounded shadow-md">
-            <span className="pl-8">{anchorPoint.id}</span>
-            <div className="flex items-center px-4 py-2">
-              <span className="material-icons mr-2">delete</span>
-              <span>Delete category</span>
-            </div>
-          </div>
-        </div>
-      )}
     </aside>
   );
 }
