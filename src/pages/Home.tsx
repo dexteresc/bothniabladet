@@ -25,7 +25,7 @@ function Home() {
       {isLoaded ? (
         <>
           <header className="mb-4">
-            <h1 className="font-semibold text-2xl">All</h1>
+            <h1 className="font-semibold text-3xl">All</h1>
           </header>
           <section>
             <PhotoGrid photos={photos} text={error?.message} />
