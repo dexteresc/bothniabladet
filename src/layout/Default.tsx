@@ -4,12 +4,14 @@ import Sidebar, { NavItem } from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { Category, getCategories } from "@/api/category";
 import { useAlert } from "@/contexts/alert";
+import { useCart } from "@/contexts/cart";
 
 interface DefaultPageProps {
   navigate: NavigateFunction;
 }
 
 function Default({ navigate }: DefaultPageProps) {
+  const { cart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const onOpen = () => {
     setIsOpen(true);
@@ -72,7 +74,7 @@ function Default({ navigate }: DefaultPageProps) {
       })
       .catch((err) => {
         setItems([]);
-        addAlert("error", err.message);
+        addAlert("error", err.response.data);
       });
   }
 
@@ -85,7 +87,7 @@ function Default({ navigate }: DefaultPageProps) {
 
   return (
     <>
-      <Navbar navigate={navigate} onOpen={onOpen} isOpen={isOpen} />
+      <Navbar navigate={navigate} onOpen={onOpen} isOpen={isOpen} cart={cart} />
       <Sidebar
         items={items}
         isOpen={isOpen}
