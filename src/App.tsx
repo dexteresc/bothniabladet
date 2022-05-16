@@ -15,6 +15,7 @@ import Search from "./pages/Search";
 import Default from "./layout/Default";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
+import Checkout from "./pages/Checkout";
 import { PhotoModal, PhotoViewFull } from "./pages/PhotoView";
 import { AlertProvider } from "./components/Alert";
 import CategoryView from "./pages/CategoryView";
@@ -115,6 +116,7 @@ function App() {
         />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 
