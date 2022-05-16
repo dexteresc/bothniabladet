@@ -193,7 +193,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
                 className="mr-0 lg:mr-2 font-semibold flex items-center p-2 lg:px-4 lg:py-2 transition-all hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-blue-200 dark:active:bg-gray-500 whitespace-nowrap select-none rounded-full lg:rounded"
               >
                 <Icon value="upload" />
-                <span className="hidden lg:block">Ladda upp</span>
+                <span className="hidden lg:block">Upload</span>
               </Link>
               <Link
                 to="/profile"

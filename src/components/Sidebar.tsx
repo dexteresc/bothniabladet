@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Category, createCategory } from "@/api/category";
+import { Category, createCategory, deleteCategory } from "@/api/category";
 import { useAlert } from "@/contexts/alert";
 import Input from "./Input";
 
@@ -13,12 +13,16 @@ function ListItem({
   item,
   className = "",
   activeId,
-  setActiveId
+  setActiveId,
+  onDelete,
+  hasOptions = true
 }: {
   item: NavItem;
   className?: string;
   activeId: number | null;
   setActiveId: (id: number) => void;
+  onDelete: (id: number) => void;
+  hasOptions?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -81,16 +85,17 @@ function ListItem({
             </span>
             {item.name}
           </button>
-          {/* Options */}
-          <button
-            type="button"
-            className={`group-hover:visible absolute top-1 right-1 h-8 py-1 rounded active:bg-gray-300 dark:active:bg-gray-600 select-none ${
-              isMenuOpen ? "visible" : "invisible"
-            }`}
-            onClick={() => setMenuOpen(!isMenuOpen)}
-          >
-            <span className="material-icons select-none">more_vert</span>
-          </button>
+          {hasOptions && (
+            <button
+              type="button"
+              className={`group-hover:visible absolute top-1 right-1 h-8 py-1 rounded active:bg-gray-300 dark:active:bg-gray-600 select-none ${
+                isMenuOpen ? "visible" : "invisible"
+              }`}
+              onClick={() => setMenuOpen(!isMenuOpen)}
+            >
+              <span className="material-icons select-none">more_vert</span>
+            </button>
+          )}
         </div>
       ) : (
         item.path && (
@@ -108,15 +113,17 @@ function ListItem({
             >
               {item.name}
             </NavLink>
-            <button
-              type="button"
-              className={`group-hover:visible absolute top-1 right-1 h-8 py-1 rounded active:bg-gray-300 dark:active:bg-gray-600 select-none ${
-                isMenuOpen ? "visible" : "invisible"
-              }`}
-              onClick={() => setMenuOpen(!isMenuOpen)}
-            >
-              <span className="material-icons select-none">more_vert</span>
-            </button>
+            {hasOptions && (
+              <button
+                type="button"
+                className={`group-hover:visible absolute top-1 right-1 h-8 py-1 rounded active:bg-gray-300 dark:active:bg-gray-600 select-none ${
+                  isMenuOpen ? "visible" : "invisible"
+                }`}
+                onClick={() => setMenuOpen(!isMenuOpen)}
+              >
+                <span className="material-icons select-none">more_vert</span>
+              </button>
+            )}
           </div>
         )
       )}
@@ -128,34 +135,22 @@ function ListItem({
               item={subItem}
               setActiveId={setActiveId}
               activeId={activeId}
+              onDelete={() => onDelete(subItem.id)}
             />
           ))}
         </ul>
       )}
       {
         // Options
-        isMenuOpen && (
+        hasOptions && isMenuOpen && (
           <div className="absolute right-0 top-10 w-4/5 mr-1 lg:w-56 bg-gray-50 dark:bg-gray-800 ring-1 ring-gray-300 dark:ring-gray-700 rounded shadow-lg z-40">
             <div className="flex flex-col">
               <ul>
-                <li className="">
-                  <NavLink
-                    to={`/categories/${item.id}/edit`}
-                    className="w-full flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
-                  >
-                    <span className="material-icons mr-1 select-none">
-                      edit
-                    </span>
-                    Edit
-                  </NavLink>
-                </li>
                 <li className="mb-2">
                   <button
                     type="button"
                     className="w-full flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
-                    onClick={() => {
-                      // TODO: Delete category
-                    }}
+                    onClick={() => onDelete(item.id)}
                   >
                     <span className="material-icons mr-1 select-none">
                       delete
@@ -246,13 +241,30 @@ function Sidebar({
       parentId: activeId ?? undefined
     })
       .then(() => {
-        addAlert("success", `${addType}`);
+        addAlert(
+          "success",
+          `${addType[0].toUpperCase()}${addType.slice(1)} added successfully`
+        );
         setIsAddOpen(false);
         setAddInputVal("");
         updateItems();
       })
       .catch((err) => {
         addAlert("error", err.message);
+      });
+  };
+
+  const handleDelete = (id: number) => {
+    deleteCategory(id)
+      .then(() => {
+        addAlert(
+          "success",
+          `Deleted successfully`
+        );
+        updateItems();
+      })
+      .catch((err) => {
+        addAlert("error", err.response.data ?? err.message ?? "Unknown error");
       });
   };
 
@@ -273,12 +285,26 @@ function Sidebar({
         }}
       >
         <ul className="">
+          <ListItem
+            item={{
+              id: 0,
+              name: "All",
+              path: "/",
+              type: "category",
+              parentId: null
+            }}
+            setActiveId={setActiveId}
+            activeId={activeId}
+            onDelete={handleDelete}
+            hasOptions={false}
+          />
           {items.map((item) => (
             <ListItem
               item={item}
               key={item.id}
               setActiveId={setActiveId}
               activeId={activeId}
+              onDelete={handleDelete}
             />
           ))}
         </ul>

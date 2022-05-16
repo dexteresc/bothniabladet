@@ -6,11 +6,10 @@ interface ModalProps {
   children: ReactNode;
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
   className?: string;
 }
 
-function Modal({ children, isOpen, onClose, title, className }: ModalProps) {
+function Modal({ children, isOpen, onClose, className }: ModalProps) {
   useEffect(() => {
     document.body.classList.toggle("overflow-hidden");
     return () => {
@@ -26,17 +25,10 @@ function Modal({ children, isOpen, onClose, title, className }: ModalProps) {
         role="none"
       />
       <div className="relative bg-white dark:bg-gray-700 rounded-lg px-2 pb-2 pt-4 z-50">
-        <header className="mb-4 flex">
-          {title && <h1 className="text-2xl mr-10">{title}</h1>}
-          <button
-            type="button"
-            className="p-4"
-            onClick={onClose}
-          >
-            <span className="material-icons">close</span>
-          </button>
-        </header>
-        <main className={className}>{children}</main>
+        <button type="button" className="p-4 absolute right-1 top-1" onClick={onClose}>
+          <span className="material-icons">close</span>
+        </button>
+        <div className={className}>{children}</div>
       </div>
     </div>
   ) : null;
