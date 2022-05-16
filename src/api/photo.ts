@@ -50,7 +50,7 @@ export const deletePhoto = (
 export const searchPhotos = (
   query: string,
   config?: AxiosRequestConfig,
-  limit?: number
+  limit: number = 100
 ): Promise<Photo[]> => {
   // Validate query
   if (typeof query !== "string") {
