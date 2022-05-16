@@ -1,5 +1,6 @@
 import { FormEvent, Component, createRef } from "react";
 import { Link, NavigateFunction } from "react-router-dom";
+import { Photo } from "@/api/photo";
 import Icon from "./Icon";
 import Logo from "./Logo";
 
@@ -7,6 +8,7 @@ interface NavbarProps {
   navigate: NavigateFunction;
   onOpen: () => void;
   isOpen: boolean;
+  cart: Photo[];
 }
 
 interface NavbarState {
@@ -29,12 +31,10 @@ class Navbar extends Component<NavbarProps, NavbarState> {
     document.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("resize", this.handleSearchResize);
 
-    // Fetch query from URL
-    // ! Is this OK?
     const searchParams = new URLSearchParams(window.location.search);
     const search = searchParams.get("q");
     if (search) {
-      this.setState({ search });
+      this.setState({ search, searchOpen: true });
     }
   }
 
@@ -117,7 +117,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
 
   render() {
     const { search, searchOpen } = this.state;
-    const { onOpen, isOpen } = this.props;
+    const { onOpen, isOpen, cart } = this.props;
     return (
       <header className="fixed top-0 w-full h-16 bg-inherit text-gray-500 dark:text-gray-200 flex items-center border-b border-b-gray-100 dark:border-b-gray-900 z-30">
         <nav className="w-full flex items-center px-4">
@@ -130,7 +130,11 @@ class Navbar extends Component<NavbarProps, NavbarState> {
             >
               {isOpen ? "close" : "menu"}
             </button>
-            <Link to="/" className="pl-2 py-2 pr-4 mr-4 flex-none outline-none" role="link">
+            <Link
+              to="/"
+              className="pl-2 py-2 pr-4 mr-4 flex-none outline-none"
+              role="link"
+            >
               <Logo className="w-12 text-black dark:text-white" />
             </Link>
           </div>
@@ -200,6 +204,15 @@ class Navbar extends Component<NavbarProps, NavbarState> {
                 className="rounded-full h-auto p-2 flex items-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 select-none"
               >
                 <Icon value="account_circle" />
+              </Link>
+              <Link
+                to="/cart"
+                className="rounded-full h-auto p-2 flex items-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 select-none"
+              >
+                <Icon value="shopping_cart" />
+                <span className="hidden lg:block">
+                  {cart.length > 0 ? cart.length : ""}
+                </span>
               </Link>
             </div>
           </div>
