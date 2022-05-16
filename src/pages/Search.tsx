@@ -18,8 +18,8 @@ function Search() {
       .then((result) => {
         setPhotos(result);
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
+        setPhotos([]);
       });
   }, [query]);
 
