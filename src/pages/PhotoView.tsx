@@ -5,6 +5,7 @@ import { deletePhoto, getPhoto, Photo } from "@/api/photo";
 import Modal from "@/components/Modal";
 import { useAlert } from "@/contexts/alert";
 import { useCart } from "@/contexts/cart";
+import Image from "@/components/Image";
 
 function PhotoView({ photo }: { photo: Photo }) {
   const navigate = useNavigate();
@@ -26,12 +27,12 @@ function PhotoView({ photo }: { photo: Photo }) {
   return (
     <div className="flex flex-col">
       <section className="mb-2">
-        <h1 className="text-2xl font-bold">{photo.title}</h1>
+        <h1 className="text-2xl font-bold mr-14">{photo.title}</h1>
         {photo.description}
-        <img
-          src={`http://localhost:8080${photo.url}`}
+        <Image
+          url={photo.url}
           alt={photo.title}
-          className="max-h-64 h-auto max-w-full rounded-lg"
+          className="max-h-64 h-auto max-w-full rounded-lg mx-auto"
         />
       </section>
       <footer className="flex justify-end">
