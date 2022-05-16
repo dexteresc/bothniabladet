@@ -58,7 +58,7 @@ function Login() {
         .catch((err) => {
           // If err.response.data is empty, then err.message is the error message
           newError.other =
-            err.response.data ?? err.message ?? "An error occurred";
+            err.response?.data ?? err.message ?? "An error occurred";
           setError(newError);
           setIsLoading(false);
         });
