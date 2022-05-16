@@ -19,6 +19,7 @@ import { PhotoModal, PhotoViewFull } from "./pages/PhotoView";
 import { AlertProvider } from "./components/Alert";
 import CategoryView from "./pages/CategoryView";
 import Loading from "./components/Loading";
+import Cart from "./pages/Cart";
 
 /*
 STYLE REF
@@ -49,7 +50,9 @@ function RequireAuth({ children }: { children: JSX.Element }) {
     if (!reToken) {
       return navigate("/login", { replace: true, state: { from: location } });
     }
-    authenticate(reToken);
+    authenticate(reToken).then(() => {
+      console.log("authenticated");
+    });
   }, [reToken]);
 
   useEffect(() => {
@@ -92,15 +95,16 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/category/*" element={<CategoryView />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route
+            path="/photo/:photoId"
+            element={
+              <RequireAuth>
+                <PhotoViewFull />
+              </RequireAuth>
+            }
+          />
         </Route>
-        <Route
-          path="/photo/:photoId"
-          element={
-            <RequireAuth>
-              <PhotoViewFull />
-            </RequireAuth>
-          }
-        />
         <Route
           path="/upload"
           element={
