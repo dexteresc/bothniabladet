@@ -45,24 +45,26 @@ function Profile() {
               Logout
             </button>
             <Modal isOpen={logoutModal} onClose={() => setLogoutModal(false)}>
-              <div className="flex flex-row justify-around">
-                <h1 className="text-xl font-semibold">Are you sure?</h1>
-                <button
-                  type="button"
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex-1 mr-1"
-                  onClick={() => {
-                    logout();
-                  }}
-                >
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex-1 ml-1"
-                  onClick={() => setLogoutModal(false)}
-                >
-                  No
-                </button>
+              <div className="flex flex-col">
+                <h1 className="text-xl font-semibold pr-14 mb-6">Are you sure?</h1>
+                <div className="flex flex-row flex-nowrap">
+                  <button
+                    type="button"
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex-1 mr-1"
+                    onClick={() => {
+                      logout();
+                    }}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex-1 ml-1"
+                    onClick={() => setLogoutModal(false)}
+                  >
+                    No
+                  </button>
+                </div>
               </div>
             </Modal>
           </section>
