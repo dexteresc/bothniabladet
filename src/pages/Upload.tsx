@@ -17,16 +17,33 @@ function Upload(props: UploadProps) {
   const [description, setDescription] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  const [isOwned, setIsOwned] = useState<boolean>(false);
+  const [count, setCount] = useState<number>(5);
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     getCategories().then((newCategories) => {
-      // Set categories that isn't folder
+      // Change name of categories to parent category name + child category name and only keep child category
       setCategories(
-        newCategories.filter((category) => category.type !== "folder")
+        newCategories
+          .map((cat) => {
+            if (cat.parentId) {
+              const newCat = { ...cat };
+              const parentCategory = newCategories.find(
+                (c) => c.id === cat.parentId
+              );
+              if (parentCategory) {
+                newCat.name = `${parentCategory.name} / ${cat.name}`;
+              }
+              return newCat;
+            }
+            return cat;
+          })
+          .filter((cat) => cat.type !== "folder")
       );
+
       setIsLoaded(true);
     });
   }, []);
@@ -58,7 +75,9 @@ function Upload(props: UploadProps) {
         description,
         file,
         userId: user.id,
-        categories: categoryIds
+        categories: categoryIds,
+        useCount: isOwned ? null : count,
+        owned: isOwned
       };
 
       uploadPhoto(data).then((response) => {
@@ -160,7 +179,52 @@ function Upload(props: UploadProps) {
                 }
               />
             </div>
-            <Input type="submit" value="Upload" />
+            {/* Is owned checkbox */}
+            <div className="flex flex-nowrap justify-between mb-4 h-9">
+              <label
+                className={`${
+                  isOwned ? "text-blue-400" : "text-gray-500"
+                } flex flex-nowrap items-center transition-colors whitespace-nowrap`}
+                htmlFor="isOwned"
+              >
+                Is owned
+                <button
+                  id="isOwned"
+                  role="checkbox"
+                  type="button"
+                  aria-checked={isOwned}
+                  className="material-icons ml-2"
+                  onClick={() => setIsOwned(!isOwned)}
+                >
+                  {isOwned ? "check_box" : "check_box_outline_blank"}
+                </button>
+              </label>
+              {!isOwned && (
+                <label
+                  className="text-sm font-semibold text-gray-500 flex items-center whitespace-nowrap"
+                  htmlFor="useCount"
+                >
+                  {/* The amount of times a photo can be used */}
+                  Use count:
+                  <Input
+                    type="number"
+                    id="useCount"
+                    name="useCount"
+                    className="ml-2"
+                    max={1000}
+                    min={0}
+                    onChange={(e) => {
+                      setCount(parseInt(e.target.value, 10));
+                    }}
+                    value={count}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div className="flex justify-end">
+              <Input type="submit" value="Upload" />
+            </div>
           </form>
         )}
       </main>
