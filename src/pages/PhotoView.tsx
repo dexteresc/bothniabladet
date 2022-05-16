@@ -24,6 +24,7 @@ function PhotoView({ photo }: { photo: Photo }) {
   return (
     <div className="flex flex-col">
       <section className="mb-2">
+        <h1 className="text-2xl font-bold">{photo.title}</h1>
         {photo.description}
         <img
           src={`http://localhost:8080${photo.url}`}
@@ -86,7 +87,7 @@ export function PhotoModal() {
   }, [photoId]);
 
   return (
-    <Modal isOpen={!!photo} onClose={() => navigate(-1)} title={photo?.title}>
+    <Modal isOpen={!!photo} onClose={() => navigate(-1)}>
       {photo && <PhotoView photo={photo} />}
     </Modal>
   );

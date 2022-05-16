@@ -44,12 +44,9 @@ function Profile() {
             >
               Logout
             </button>
-            <Modal
-              title="Are you sure?"
-              isOpen={logoutModal}
-              onClose={() => setLogoutModal(false)}
-            >
+            <Modal isOpen={logoutModal} onClose={() => setLogoutModal(false)}>
               <div className="flex flex-row justify-around">
+                <h1 className="text-xl font-semibold">Are you sure?</h1>
                 <button
                   type="button"
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex-1 mr-1"
