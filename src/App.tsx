@@ -21,6 +21,7 @@ import { AlertProvider } from "./components/Alert";
 import CategoryView from "./pages/CategoryView";
 import Loading from "./components/Loading";
 import Cart from "./pages/Cart";
+import CartProvider from "./contexts/CartProvider";
 
 /*
 STYLE REF
@@ -51,9 +52,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
     if (!reToken) {
       return navigate("/login", { replace: true, state: { from: location } });
     }
-    authenticate(reToken).then(() => {
-      console.log("authenticated");
-    });
+    authenticate(reToken);
   }, [reToken]);
 
   useEffect(() => {
@@ -83,48 +82,50 @@ function App() {
 
   return (
     <AlertProvider>
-      <Routes location={state?.backgroundLocation || location}>
-        <Route
-          path="/"
-          element={
-            <RequireAuth>
-              <Default navigate={navigate} />
-            </RequireAuth>
-          }
-        >
-          <Route path="" element={<Home />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/category/*" element={<CategoryView />} />
-          <Route path="/cart" element={<Cart />} />
+      <CartProvider>
+        <Routes location={state?.backgroundLocation || location}>
           <Route
-            path="/photo/:photoId"
+            path="/"
             element={
               <RequireAuth>
-                <PhotoViewFull />
+                <Default navigate={navigate} />
+              </RequireAuth>
+            }
+          >
+            <Route path="" element={<Home />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/category/*" element={<CategoryView />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route
+              path="/photo/:photoId"
+              element={
+                <RequireAuth>
+                  <PhotoViewFull />
+                </RequireAuth>
+              }
+            />
+            <Route path="/checkout" element={<Checkout />} />
+          </Route>
+          <Route
+            path="/upload"
+            element={
+              <RequireAuth>
+                <Upload navigate={navigate} />
               </RequireAuth>
             }
           />
-        </Route>
-        <Route
-          path="/upload"
-          element={
-            <RequireAuth>
-              <Upload navigate={navigate} />
-            </RequireAuth>
-          }
-        />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-
-      {state?.backgroundLocation && (
-        <Routes>
-          <Route path="/photo/:photoId" element={<PhotoModal />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      )}
+
+        {state?.backgroundLocation && (
+          <Routes>
+            <Route path="/photo/:photoId" element={<PhotoModal />} />
+          </Routes>
+        )}
+      </CartProvider>
     </AlertProvider>
   );
 }
