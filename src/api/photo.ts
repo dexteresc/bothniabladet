@@ -1,12 +1,13 @@
 import { AxiosRequestConfig } from "axios";
 import { del, get, post } from "./axios";
 import { Category } from "./category";
-import { User } from "./user";
 
-interface PhotoUpload {
+export interface PhotoUpload {
   file: File;
   title: string;
   description: string;
+  userId: number;
+  categories?: number[];
 }
 
 export interface Photo {
@@ -14,7 +15,7 @@ export interface Photo {
   url: string;
   title: string;
   description: string;
-  user?: User;
+  userId: number;
   categories?: Category[];
   createdDate: string;
   updatedDate: string;
@@ -28,7 +29,8 @@ export const uploadPhoto = (
   formData.append("file", photo.file);
   formData.append("title", photo.title);
   formData.append("description", photo.description);
-
+  formData.append("userId", photo.userId.toString());
+  formData.append("categories", JSON.stringify(photo.categories));
   return post<FormData, Photo>("/photo", formData, config);
 };
 
