@@ -9,6 +9,7 @@ import {
   useEffect,
   useState
 } from "react";
+import Icon from "./Icon";
 
 const Input = forwardRef(
   (
@@ -155,9 +156,10 @@ function SelectItem({
       >
         {option.name}
       </div>
-      <div className="material-icons ml-2 text-gray-600 dark:text-gray-500">
-        {isSelected ? "check_box" : "check_box_outline_blank"}
-      </div>
+      <Icon
+        value={isSelected ? "check_box" : "check_box_outline_blank"}
+        className="ml-2 text-gray-600 dark:text-gray-500"
+      />
     </button>
   );
 }
