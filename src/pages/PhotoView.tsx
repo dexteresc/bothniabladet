@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
 import { deletePhoto, getPhoto, Photo } from "@/api/photo";
+//import { AddToBasket } from "@/api/basket";
 import Modal from "@/components/Modal";
 import { useAlert } from "@/contexts/alert";
 
@@ -32,16 +33,22 @@ function PhotoView({ photo }: { photo: Photo }) {
         />
       </section>
       <footer className="flex justify-end">
+        <button
+        type="button"
+        className="ml-2 text-white bg-blue-500 hover:bg-blue-700 rounded-lg px-2 py-1 ml-1"
+        >
+          <Icon value="shopping_cart" className="text-inherit" />
+        </button>
         <a
           href={`http://localhost:8080${photo.url}/download`}
           download={photo.title}
-          className="hover:text-white"
+          className="ml-2 hover:text-white bg-green-500 hover:bg-green-700 rounded-lg px-2 py-1 ml-1"
         >
-          <Icon value="get_app" className="text-inherit" />
+          <span className="material-icons flex h-7 justify-center items-center">download</span>
         </a>
         <button
           type="button"
-          className="ml-2 text-white bg-red-500 hover:bg-red-700 rounded-lg"
+          className="ml-2 text-white bg-red-500 hover:bg-red-700 rounded-lg px-2 py-1 ml-1"
           onClick={handleDelete}
         >
           <Icon value="delete" className="text-inherit" />
