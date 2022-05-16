@@ -68,27 +68,10 @@ function Default({ navigate }: DefaultPageProps) {
   function retrieveCategories() {
     getCategories()
       .then((categories) => {
-        setItems(() => [
-          {
-            id: 0,
-            name: "All",
-            path: "/",
-            type: "category",
-            parentId: null
-          },
-          ...spreadTree(categories)
-        ]);
+        setItems(() => spreadTree(categories));
       })
       .catch((err) => {
-        setItems([
-          {
-            id: 0,
-            name: "All",
-            path: "/",
-            type: "category",
-            parentId: null
-          }
-        ]);
+        setItems([]);
         addAlert("error", err.message);
       });
   }
@@ -96,15 +79,7 @@ function Default({ navigate }: DefaultPageProps) {
   useEffect(() => {
     retrieveCategories();
     return () => {
-      setItems([
-        {
-          id: 0,
-          name: "All",
-          path: "/",
-          type: "category",
-          parentId: null
-        }
-      ]);
+      setItems([]);
     };
   }, []);
 
