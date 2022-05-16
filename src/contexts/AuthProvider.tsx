@@ -34,11 +34,13 @@ function AuthProvider({ children }: { children: ReactNode }) {
       }
     })
       .then((data) => {
-        login(data, newToken);
+        axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+        setUser(data);
+        setIsAuthenticated(true);
+        setToken(newToken);
       })
       .catch(() => {
-        setUser(null);
-        setToken("");
+        logout();
       });
   };
 

@@ -12,8 +12,6 @@ interface IAuthContext {
 
 const AuthContext = createContext<IAuthContext>(null!);
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);
 
 export default AuthContext;
