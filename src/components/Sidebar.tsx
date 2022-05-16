@@ -257,10 +257,7 @@ function Sidebar({
   const handleDelete = (id: number) => {
     deleteCategory(id)
       .then(() => {
-        addAlert(
-          "success",
-          `Deleted successfully`
-        );
+        addAlert("success", "Deleted successfully");
         updateItems();
       })
       .catch((err) => {
