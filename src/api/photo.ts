@@ -7,6 +7,8 @@ export interface PhotoUpload {
   title: string;
   description: string;
   userId: number;
+  owned: boolean;
+  useCount: number | null;
   categories?: number[];
 }
 
@@ -17,20 +19,32 @@ export interface Photo {
   description: string;
   userId: number;
   categories?: Category[];
+  useCount: number;
+  owned: boolean;
   createdDate: string;
   updatedDate: string;
 }
 
 export const uploadPhoto = (
-  photo: PhotoUpload,
+  {
+    file,
+    title,
+    description,
+    useCount,
+    owned,
+    categories,
+    userId
+  }: PhotoUpload,
   config?: AxiosRequestConfig
 ): Promise<Photo> => {
   const formData = new FormData();
-  formData.append("file", photo.file);
-  formData.append("title", photo.title);
-  formData.append("description", photo.description);
-  formData.append("userId", photo.userId.toString());
-  formData.append("categories", JSON.stringify(photo.categories));
+  formData.append("file", file);
+  formData.append("title", title);
+  formData.append("description", description);
+  formData.append("userId", userId.toString());
+  formData.append("owned", owned.toString());
+  formData.append("useCount", useCount ? useCount.toString() : "");
+  formData.append("categories", JSON.stringify(categories));
   return post<FormData, Photo>("/photo", formData, config);
 };
 

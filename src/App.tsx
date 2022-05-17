@@ -15,7 +15,6 @@ import Search from "./pages/Search";
 import Default from "./layout/Default";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
-import Checkout from "./pages/Checkout";
 import { PhotoModal, PhotoViewFull } from "./pages/PhotoView";
 import { AlertProvider } from "./components/Alert";
 import CategoryView from "./pages/CategoryView";
@@ -97,15 +96,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/category/*" element={<CategoryView />} />
             <Route path="/cart" element={<Cart />} />
-            <Route
-              path="/photo/:photoId"
-              element={
-                <RequireAuth>
-                  <PhotoViewFull />
-                </RequireAuth>
-              }
-            />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/photo/:photoId" element={<PhotoViewFull />} />
           </Route>
           <Route
             path="/upload"

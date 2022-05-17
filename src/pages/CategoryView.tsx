@@ -42,13 +42,16 @@ export default function CategoryView() {
       .then(([cat, pho]) => {
         setCategory(cat);
         setPhotos(pho);
+        setIsLoaded(true);
       })
       .catch((err) => {
-        setError(err);
-        addAlert("error", err.message);
-      })
-      .finally(() => {
-        setIsLoaded(true);
+        setError(
+          err.response.data ? new Error(err.response.data.message) : err
+        );
+        addAlert("error", err.response?.data || err.message);
+        if (err.response?.status === 404) {
+          navigate("/");
+        }
       });
   }, [params]);
 
@@ -58,7 +61,7 @@ export default function CategoryView() {
         <>
           {category && (
             <header className="mb-4 flex justify-between">
-              <h1 className="font-semibold text-2xl">{category.name}</h1>
+              <h1 className="font-semibold text-3xl">{category.name}</h1>
             </header>
           )}
           <section>

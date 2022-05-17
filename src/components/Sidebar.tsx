@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Category, createCategory, deleteCategory } from "@/api/category";
 import { useAlert } from "@/contexts/alert";
 import Input from "./Input";
@@ -11,14 +11,12 @@ export interface NavItem extends Category {
 
 function ListItem({
   item,
-  className = "",
   activeId,
   setActiveId,
   onDelete,
   hasOptions = true
 }: {
   item: NavItem;
-  className?: string;
   activeId: number | null;
   setActiveId: (id: number) => void;
   onDelete: (id: number) => void;
@@ -62,16 +60,14 @@ function ListItem({
   }, [isMenuOpen]);
 
   return (
-    <li className={`relative mb-2 last:mb-0 h-fit ${className}`}>
+    <li className="relative mb-2 last:mb-0">
       {item.type === "folder" ? (
-        <div
-          className={`relative group rounded ${
-            activeId === item.id ? "ring-1 ring-inset" : ""
-          }`}
-        >
+        <div className="relative group rounded">
           <button
             type="button"
-            className="flex-1 flex items-center pl-2 pr-4 py-2 rounded transition-all whitespace-nowrap w-full outline-none group-hover:bg-gray-100 dark:group-hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+            className={`flex-1 flex ${
+              activeId === item.id ? "ring-1 ring-inset" : ""
+            } items-center pl-2 pr-4 py-2 rounded transition-all whitespace-nowrap w-full outline-none group-hover:bg-gray-100 dark:group-hover:bg-gray-700 group-hover:active:bg-gray-200 dark:group-hover:active:bg-gray-600`}
             onClick={() => {
               toggle();
               setActiveId(item.id);
@@ -103,7 +99,7 @@ function ListItem({
             <NavLink
               to={item.path}
               className={({ isActive }) =>
-                `outline-none flex justify-between items-center py-2 pr-4 pl-9 rounded whitespace-nowrap w-full group-hover:transition-colors group-hover:bg-gray-100 dark:group-hover:bg-gray-700 active:bg-blue-100 dark:active:bg-gray-500
+                `outline-none flex justify-between items-center py-2 pr-4 pl-9 rounded whitespace-nowrap w-full group-hover:transition-colors group-hover:bg-gray-100 dark:group-hover:bg-gray-700 group-hover:active:bg-blue-100 dark:group-hover:active:bg-gray-500
               ${
                 isActive
                   ? "text-blue-500 dark:text-blue-300 font-semibold bg-gray-100 dark:bg-gray-700"
@@ -143,13 +139,13 @@ function ListItem({
       {
         // Options
         hasOptions && isMenuOpen && (
-          <div className="absolute right-0 top-10 w-4/5 mr-1 lg:w-56 bg-gray-50 dark:bg-gray-800 ring-1 ring-gray-300 dark:ring-gray-700 rounded shadow-lg z-40">
+          <div className="absolute right-0 top-10 w-4/5 mr-1 lg:w-56 bg-gray-50 dark:bg-gray-800 ring-1 ring-gray-300 dark:ring-gray-700 rounded shadow z-40">
             <div className="flex flex-col">
               <ul>
-                <li className="mb-2">
+                <li className="">
                   <button
                     type="button"
-                    className="w-full flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+                    className="rounded w-full flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
                     onClick={() => onDelete(item.id)}
                   >
                     <span className="material-icons mr-1 select-none">
@@ -186,6 +182,7 @@ function Sidebar({
   const [addInputVal, setAddInputVal] = useState(""); // Add category input value
   const [isAddOpen, setIsAddOpen] = useState(false); // Add category open state
   const [addType, setAddType] = useState<"folder" | "category">("folder"); // Add category type
+  const navigate = useNavigate();
 
   // Closes sidebar if clicked outside or clicked on link
   useEffect(() => {
@@ -259,6 +256,7 @@ function Sidebar({
       .then(() => {
         addAlert("success", "Deleted successfully");
         updateItems();
+        navigate("/");
       })
       .catch((err) => {
         addAlert("error", err.response.data ?? err.message ?? "Unknown error");

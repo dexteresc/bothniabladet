@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 import Input from "@/components/Input";
 import Loading from "@/components/Loading";
-import { login, signup } from "@/api/auth";
+import { signup } from "@/api/auth";
 
 interface SignUpError {
   email?: string;
@@ -46,10 +46,7 @@ function SignUp() {
       setIsLoading(true);
       await signup(email, password)
         .then(() => {
-          login(email, password).then(() => {
-            setError(newError);
-            navigate("/");
-          });
+          navigate("/login"); // Redirect to login
         })
         .catch((err) => {
           newError.other =
