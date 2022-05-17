@@ -23,6 +23,7 @@ function CartItem({ photo }: { photo: Photo }) {
       >
         delete
       </button>
+      
     </li>
   );
 }
@@ -43,6 +44,11 @@ function Cart() {
         onClick={clearCart}
       >
         Clear cart
+      </button>
+      <button
+      type="button"
+      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded " >
+        Checkout
       </button>
     </div>
   );
