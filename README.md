@@ -1,6 +1,6 @@
 # BothniaBladet
 
-[Link to API](https://github.com/dexteresc/bothniabladet/edit/main/README.md)
+[Link to API](https://github.com/dexteresc/bothniabladet-api)
 
 ## Requirements
 
