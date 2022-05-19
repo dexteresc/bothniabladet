@@ -24,7 +24,6 @@ function CartItem({ photo }: { photo: Photo }) {
     </li>
   );
 }
-
 function Cart() {
   const { cart } = useCart();
 

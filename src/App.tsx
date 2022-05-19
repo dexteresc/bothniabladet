@@ -49,6 +49,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   // eslint-disable-next-line consistent-return
   useEffect(() => {
     if (!reToken) {
+      // remove cart
+      localStorage.removeItem("cart");
       return navigate("/login", { replace: true, state: { from: location } });
     }
     authenticate(reToken);

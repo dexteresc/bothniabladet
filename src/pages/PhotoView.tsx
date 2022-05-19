@@ -36,6 +36,14 @@ function PhotoView({ photo }: { photo: Photo }) {
         />
       </section>
       <footer className="flex justify-end">
+      <button
+          type="button"
+          className="text-white bg-yellow-500 hover:bg-yellow-700 rounded-lg px-2 py-1 ml-1"
+          onClick={() => {
+            console.log("Yeet")
+          }}>
+          <Icon value="info" className="text-inherit" />
+        </button>
         <button
           type="button"
           className="text-white bg-blue-500 hover:bg-blue-700 rounded-lg px-2 py-1 ml-1"
