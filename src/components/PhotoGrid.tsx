@@ -13,6 +13,7 @@ function PhotoItem({ photo }: { photo: Photo }) {
           url={photo.url}
           alt={photo.title}
           className="max-h-64 h-auto max-w-full peer rounded-lg"
+          owned={!!photo.useCount}
         />
       </Link>
       <div className="flex justify-between absolute p-1 right-0 top-0 left-0 w-full rounded-t-lg bg-gray-900 transition-opacity opacity-0 hover:opacity-50 peer-hover:opacity-50">
