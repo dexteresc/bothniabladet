@@ -24,29 +24,71 @@ function PhotoView({ photo }: { photo: Photo }) {
       });
   };
 
+  const [infoOpen, setInfoOpen] = useState(false);
+
+  useEffect(() => {
+    // on click anywhere, close
+    const handleClick = (e: MouseEvent) => {
+      if (e.target) setInfoOpen(false);
+    };
+    if (infoOpen) {
+      // Click outside to close
+      document.addEventListener("click", handleClick);
+    }
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [infoOpen]);
+
   return (
     <div className="flex flex-col">
       <section className="mb-2">
-        <h1 className="text-2xl font-bold mr-14">{photo.title}</h1>
-        {photo.description}
+        <h1 className="text-2xl font-bold mr-14 mb-2">{photo.title}</h1>
+        <p className="mb-4">{photo.description}</p>
         <Image
           url={photo.url}
           alt={photo.title}
-          className="max-h-64 h-auto max-w-full rounded-lg mx-auto"
+          owned={!!photo.useCount}
+          className="max-h-[60vh] h-auto max-w-full rounded-lg mx-auto"
         />
       </section>
-      <footer className="flex justify-end">
-      <button
-          type="button"
-          className="text-white bg-yellow-500 hover:bg-yellow-700 rounded-lg px-2 py-1 ml-1"
-          onClick={() => {
-            console.log("Yeet")
-          }}>
-          <Icon value="info" className="text-inherit" />
-        </button>
+      <footer className="relative flex justify-end">
         <button
           type="button"
-          className="text-white bg-blue-500 hover:bg-blue-700 rounded-lg px-2 py-1 ml-1"
+          className="bg-yellow-500 hover:bg-yellow-700 rounded-lg px-2 py-1 ml-1"
+          onClick={() => setInfoOpen(!infoOpen)}
+        >
+          <Icon value="info" className="text-white" />
+        </button>
+        {/* Info hover box */}
+        {infoOpen && (
+          <div className="absolute bottom-full mb-2 right-0 px-4 py-2 bg-black rounded text-white">
+            <p>
+              <span className="font-semibold">Photo id:</span> {photo.id}
+            </p>
+            <p>
+              <span className="font-semibold">Created at:</span>{" "}
+              {new Date(photo.createdAt).toLocaleDateString()}
+            </p>
+            <p>
+              <span className="font-semibold">Updated at:</span>{" "}
+              {new Date(photo.updatedAt).toLocaleDateString()}
+            </p>
+            <p>
+              <span className="font-semibold">URL:</span> {photo.url}
+            </p>
+            {photo.useCount && (
+              <p>
+                <span className="font-semibold">Uses left:</span>{" "}
+                {photo.useCount}
+              </p>
+            )}
+          </div>
+        )}
+
+        <button
+          type="button"
+          className=" bg-blue-500 hover:bg-blue-700 rounded-lg px-2 py-1 ml-1"
           onClick={() => {
             if (cart.find((p) => p.id === photo.id)) {
               addAlert("error", "Photo already in cart");
@@ -57,7 +99,7 @@ function PhotoView({ photo }: { photo: Photo }) {
             addAlert("success", "Photo added to cart");
           }}
         >
-          <Icon value="shopping_cart" className="text-inherit" />
+          <Icon value="shopping_cart" className="text-white" />
         </button>
         <a
           href={`http://localhost:8080${photo.url}/download`}
@@ -115,7 +157,7 @@ export function PhotoModal() {
   }, [photoId]);
 
   return (
-    <Modal isOpen={!!photo} onClose={() => navigate(-1)}>
+    <Modal isOpen={!!photo} onClose={() => navigate(-1)} className="px-2">
       {photo && <PhotoView photo={photo} />}
     </Modal>
   );

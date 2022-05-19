@@ -19,10 +19,10 @@ export interface Photo {
   description: string;
   userId: number;
   categories?: Category[];
-  useCount: number;
+  useCount: number | null;
   owned: boolean;
-  createdDate: string;
-  updatedDate: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const uploadPhoto = (
@@ -43,7 +43,9 @@ export const uploadPhoto = (
   formData.append("description", description);
   formData.append("userId", userId.toString());
   formData.append("owned", owned.toString());
-  formData.append("useCount", useCount ? useCount.toString() : "");
+  if (useCount !== null) {
+    formData.append("useCount", useCount.toString());
+  }
   formData.append("categories", JSON.stringify(categories));
   return post<FormData, Photo>("/photo", formData, config);
 };
