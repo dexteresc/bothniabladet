@@ -2,6 +2,10 @@
 
 [Link to API](https://github.com/dexteresc/bothniabladet-api)
 
+## Example
+![image](https://user-images.githubusercontent.com/63741680/169398462-0228737e-70f8-4cd8-a2fc-1b5cf039c1b1.png)
+
+
 ## Requirements
 
 - Node
