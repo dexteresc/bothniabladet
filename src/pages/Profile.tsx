@@ -21,6 +21,9 @@ function Profile() {
         <>
           <section className="mb-4">
             <h2 className="text-xl border-b mb-4 pb-2 font-medium">Account</h2>
+            <p>
+              <span className="font-semibold">Id:</span> {user.id}
+            </p>
             {user.firstName && user.lastName && (
               <p>
                 <span className="font-semibold">Name:</span> {user.firstName}{" "}
@@ -46,7 +49,9 @@ function Profile() {
             </button>
             <Modal isOpen={logoutModal} onClose={() => setLogoutModal(false)}>
               <div className="flex flex-col">
-                <h1 className="text-xl font-semibold pr-14 mb-6">Are you sure?</h1>
+                <h1 className="text-xl font-semibold pr-14 mb-6">
+                  Are you sure?
+                </h1>
                 <div className="flex flex-row flex-nowrap">
                   <button
                     type="button"
