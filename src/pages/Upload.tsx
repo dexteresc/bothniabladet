@@ -5,6 +5,7 @@ import Input, { FileInput, SelectList, TextArea } from "@/components/Input";
 import { PhotoUpload, uploadPhoto } from "@/api/photo";
 import Loading from "@/components/Loading";
 import { useAuth } from "@/contexts/auth";
+import { useAlert } from "@/contexts/alert";
 
 interface UploadProps {
   navigate: NavigateFunction;
@@ -12,6 +13,7 @@ interface UploadProps {
 
 function Upload(props: UploadProps) {
   const { user } = useAuth();
+  const { addAlert } = useAlert();
   const fileInputEl = createRef<FileInput>();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -68,7 +70,7 @@ function Upload(props: UploadProps) {
       return;
     }
 
-    if (title && description && user) {
+    if (title && user) {
       const categoryIds = selectedCategories.map((category) => category.id);
       const data: PhotoUpload = {
         title,
@@ -88,7 +90,7 @@ function Upload(props: UploadProps) {
         }
       });
     } else {
-      setError(new Error("Title and description required."));
+      setError(new Error("Title required."));
     }
   };
 
@@ -104,6 +106,12 @@ function Upload(props: UploadProps) {
     }
   };
 
+  useEffect(() => {
+    if (error) {
+      addAlert("error", error.message);
+    }
+  }, [error]);
+
   return (
     <main className="flex flex-col min-h-screen py-5 max-w-3xl mx-auto px-4">
       <header className="mb-4">
@@ -113,7 +121,6 @@ function Upload(props: UploadProps) {
         <h1 className="font-semibold text-2xl">Upload</h1>
       </header>
       <main className="flex-1">
-        {error && <div>Error: {error.message}</div>}
         {!isLoaded && <Loading className="flex-1" />}
         {isLoaded && (
           <form className="flex flex-col" onSubmit={handleSubmit}>
