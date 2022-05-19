@@ -1,8 +1,20 @@
-import { ReactNode, useMemo, useState } from "react";
+import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import axios from "axios";
 import { User } from "@/api/user";
-import AuthContext from "./auth";
 import { get } from "@/api/axios";
+
+interface IAuthContext {
+  isAuthenticated: boolean;
+  user: User | null;
+  token: string;
+  login(user: User, token: string): void;
+  logout(): void;
+  authenticate(token: string): Promise<void>;
+}
+
+const AuthContext = createContext<IAuthContext>(null!);
+
+export const useAuth = () => useContext(AuthContext);
 
 function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

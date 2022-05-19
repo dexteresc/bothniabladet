@@ -1,6 +1,29 @@
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState
+} from "react";
+
 import { Photo } from "@/api/photo";
-import CartContext from "./cart";
+
+interface CartContextType {
+  cart: Photo[];
+  addItem: (item: Photo) => void;
+  removeItem: (id: number) => void;
+  clearCart: () => void;
+}
+
+const CartContext = createContext<CartContextType>({
+  cart: [],
+  addItem: () => {},
+  removeItem: () => {},
+  clearCart: () => {}
+});
+
+export const useCart = () => useContext(CartContext);
 
 function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<Photo[]>([]);

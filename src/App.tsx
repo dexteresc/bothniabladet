@@ -16,11 +16,11 @@ import Default from "./layout/Default";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
 import { PhotoModal, PhotoViewFull } from "./pages/PhotoView";
-import { AlertProvider } from "./components/Alert";
 import CategoryView from "./pages/CategoryView";
 import Loading from "./components/Loading";
 import Cart from "./pages/Cart";
-import CartProvider from "./contexts/CartProvider";
+import CartProvider from "./contexts/cart";
+import AlertProvider from "./contexts/alert";
 
 /*
 STYLE REF
