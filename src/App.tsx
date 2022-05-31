@@ -53,8 +53,10 @@ function RequireAuth({ children }: { children: JSX.Element }) {
       localStorage.removeItem("cart");
       return navigate("/login", { replace: true, state: { from: location } });
     }
-    authenticate(reToken);
-  }, [reToken]);
+    authenticate(reToken).catch(() => {
+      navigate("/login", { replace: true, state: { from: location } });
+    });
+  }, []);
 
   useEffect(() => {
     if (token) {

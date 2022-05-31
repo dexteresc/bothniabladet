@@ -53,7 +53,8 @@ function Login() {
           }
           auth.login(user, token);
           setIsLoading(false);
-          navigate("/"); // Redirect to home
+          // eslint-disable-next-line no-restricted-globals
+          navigate(history.state.usr?.from ?? "/");
         })
         .catch((err) => {
           // If err.response.data is empty, then err.message is the error message

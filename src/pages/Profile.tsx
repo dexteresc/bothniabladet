@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal";
 import ThemeButton from "@/components/ThemeButton";
 import { useAuth } from "@/contexts/auth";
@@ -6,6 +7,7 @@ import { useAuth } from "@/contexts/auth";
 function Profile() {
   const { user, logout } = useAuth();
   const [logoutModal, setLogoutModal] = useState(false);
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col">
       {/* Settings */}
@@ -58,6 +60,7 @@ function Profile() {
                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex-1 mr-1"
                     onClick={() => {
                       logout();
+                      navigate("/login");
                     }}
                   >
                     Yes
