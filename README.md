@@ -16,38 +16,20 @@
 
 You should have the api running. 
 
-### Yarn
+### npm / yarn 
 
 Install packages
 
-`yarn` 
+`yarn` or `npm install`
 
 Run development server
 
-`yarn dev`
+`yarn dev` or `npm run dev`
 
 Build application
 
-`yarn build`
+`yarn build` or `npm run build`
 
 Preview built application
 
-`yarn preview`
-
-### Npm
-
-Install packages
-
-`npm install`
-
-Run development server
-
-`npm run dev`
-
-Build application
-
-`npm run build`
-
-Preview built application
-
-`npm run preview`
+`yarn preview` or `npm run preview`
