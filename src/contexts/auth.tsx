@@ -35,12 +35,12 @@ function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(false);
     setUser(null);
     setToken("");
-    // Remove from localStorage
-    localStorage.removeItem("token");
+    localStorage.removeItem("token"); // Remove from localStorage
+    delete axios.defaults.headers.common.Authorization; // Remove token from Axios
   };
 
-  const authenticate = async (newToken: string) => {
-    await get<User>("/auth/validate", {
+  const authenticate = (newToken: string) =>
+    get<User>("/auth/validate", {
       headers: {
         Authorization: `Bearer ${newToken}`
       }
@@ -51,10 +51,10 @@ function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(true);
         setToken(newToken);
       })
-      .catch(() => {
+      .catch((e) => {
         logout();
+        throw e;
       });
-  };
 
   const value = useMemo(
     () => ({ isAuthenticated, user, token, login, logout, authenticate }),
