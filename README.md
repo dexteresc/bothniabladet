@@ -16,7 +16,7 @@
 
 You should have the api running. 
 
-### npm / yarn 
+### yarn / npm
 
 Install packages
 
